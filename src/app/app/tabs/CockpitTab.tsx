@@ -1,0 +1,133 @@
+'use client'
+import { useDashboard, fmt, pctOf, todayISO, formatDateBR } from '@/context/DashboardContext'
+import { HealthRing, StatsCard, LimitBar, Chart6Months } from '@/components/ui'
+
+export default function CockpitTab() {
+  const { stats, transactions, chartData, setActiveTab, addTransaction } = useDashboard()
+
+  const margem = parseFloat(pctOf(stats.monthProfit, stats.monthRevenue))
+  const pctLimit = parseFloat(pctOf(stats.yearRevenue, 81000))
+  const limitColor = pctLimit > 80 ? 'var(--red)' : pctLimit > 60 ? 'var(--amber)' : 'var(--green)'
+
+  const thisMonth = todayISO().slice(0, 7)
+  const dasPaidThisMonth = transactions.some(
+    (t: any) => t.description === 'DAS Mensal' && t.type === 'out' && t.date?.startsWith(thisMonth)
+  )
+
+  return (
+    <>
+      {/* DAS Alert */}
+      {!dasPaidThisMonth && (
+        <div className="alert card-amber" style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '20px', flexShrink: 0 }}>⚠️</div>
+          <div>
+            <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '3px' }}>Lembre-se do DAS mensal</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text2)' }}>Pague até o dia 20 de cada mês para evitar multas e juros.</p>
+          </div>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', flexShrink: 0 }}>
+            <button className="btn-add" style={{ padding: '7px 14px', fontSize: '12px', background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)', color: 'var(--amber)' }}
+              onClick={() => setActiveTab('lancamentos')}>Registrar</button>
+            <button className="btn-add" style={{ padding: '7px 14px', fontSize: '12px' }}
+              onClick={() => window.open('https://www8.receita.fazenda.gov.br/SimplesNacional/Aplicacoes/ATSPO/pgmei.app/Identificacao', '_blank')}>
+              Pagar agora →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* KPI Grid */}
+      <div className="grid-4" style={{ marginBottom: '20px' }}>
+        <div className="card card-green">
+          <div className="card-title">SALDO DO NEGÓCIO</div>
+          <div className="card-value" style={{ color: 'var(--green)' }}>{fmt(stats.monthProfit)}</div>
+          <div className="card-sub">Receita − Despesas do mês</div>
+        </div>
+        <div className="card">
+          <div className="card-title">RECEITA DO MÊS</div>
+          <div className="card-value" style={{ color: '#6ee7b7' }}>{fmt(stats.monthRevenue)}</div>
+          <div className="card-sub">Total de entradas</div>
+        </div>
+        <div className="card">
+          <div className="card-title">LUCRO REAL</div>
+          <div className="card-value" style={{ color: 'var(--green)' }}>{fmt(stats.monthProfit)}</div>
+          <div style={{ fontSize: '12px', color: 'var(--green)', marginTop: '6px', fontWeight: 700 }}>↑ {margem}% de margem</div>
+        </div>
+        <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', textAlign: 'center' }}>
+          <HealthRing score={stats.healthScore} />
+          <div style={{ fontSize: '11px', color: 'var(--text3)', marginTop: '4px' }}>Saúde Financeira</div>
+        </div>
+      </div>
+
+      {/* Limite MEI */}
+      <div className="card" style={{ marginBottom: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <div>
+            <div style={{ fontSize: '13px', fontWeight: 700 }}>Limite Anual MEI</div>
+            <div style={{ fontSize: '12px', color: 'var(--text3)', marginTop: '2px' }}>{fmt(stats.yearRevenue)} de {fmt(81000)}</div>
+          </div>
+          <div style={{ fontSize: '24px', fontWeight: 900, fontFamily: 'var(--mono)', color: limitColor }}>{pctLimit}%</div>
+        </div>
+        <LimitBar value={stats.yearRevenue} max={81000} color={limitColor} />
+        <div style={{ fontSize: '12px', color: 'var(--text3)', marginTop: '6px' }}>
+          {pctLimit >= 80 ? '🚨 Próximo do limite — considere migrar para ME.' : pctLimit >= 60 ? '⚠️ Acompanhe o crescimento.' : '✅ Limite anual sob controle.'}
+        </div>
+      </div>
+
+      {/* Atividade + Tarefas */}
+      <div className="grid-21">
+        <div className="card">
+          <div className="card-title">ATIVIDADE RECENTE</div>
+          <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {transactions.length === 0 ? (
+              <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text3)', fontSize: '13px' }}>
+                Nenhuma movimentação ainda.<br />
+                <button className="btn-add" style={{ marginTop: '12px', fontSize: '12px', padding: '8px 16px' }}
+                  onClick={() => setActiveTab('lancamentos')}>Fazer primeiro lançamento →</button>
+              </div>
+            ) : transactions.slice(0, 6).map((t: any) => (
+              <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px' }}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <div style={{
+                    width: '32px', height: '32px', border: '1px solid var(--card-border)', borderRadius: '8px',
+                    color: t.type === 'in' ? 'var(--green)' : 'var(--red)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px',
+                    background: t.type === 'in' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'
+                  }}>{t.type === 'in' ? '↑' : '↓'}</div>
+                  <div>
+                    <div style={{ fontSize: '14px', fontWeight: 600 }}>{t.description}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text3)' }}>{formatDateBR(t.date)} · {t.category}</div>
+                  </div>
+                </div>
+                <div className={t.type === 'in' ? 'tx-in' : 'tx-out'}>{t.type === 'in' ? '+' : '-'}{fmt(t.value)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card card-blue">
+          <div className="card-title">⚡ TAREFAS DO DIA</div>
+          <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {[
+              ['💰', 'Lance sua receita de hoje', 'lancamentos'],
+              ['⚠️', 'Verifique o vencimento do DAS', 'financeiro'],
+              ['🤖', 'Pergunte algo para a IA', 'ia'],
+            ].map(([icon, text, tab], i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0', borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none', cursor: 'pointer' }}
+                onClick={() => setActiveTab(tab)}>
+                <span style={{ fontSize: '16px' }}>{icon}</span>
+                <span style={{ fontSize: '13px', lineHeight: '1.4' }}>{text}</span>
+                <span style={{ marginLeft: 'auto', color: 'var(--blue)', fontSize: '12px' }}>→</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Mini chart */}
+          <div style={{ marginTop: '20px', borderTop: '1px solid var(--card-border)', paddingTop: '16px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text3)', marginBottom: '8px', letterSpacing: '1px' }}>TENDÊNCIA 6 MESES</div>
+            <Chart6Months data={chartData} />
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}

@@ -13,7 +13,6 @@ export type Transaction = {
   category: string
   date: string
   created_at: string
-  // Sprint 2/3 — opcionais para não quebrar transações antigas (sem migration)
   source?: 'manual' | 'bank_sync'
   external_id?: string
   is_personal?: boolean
@@ -69,11 +68,10 @@ export type Stats = {
   monthProfit: number
   yearRevenue: number
   healthScore: number
-  // Sprint 3: métricas separando negócio x pessoal
-  monthRevenueNet: number    // receita excluindo gastos pessoais
-  monthExpensesNet: number   // despesas só do negócio (is_personal = false)
-  monthProfitNet: number     // lucro real do negócio
-  bankSyncCount: number      // total de transações importadas do banco este mês
+  monthRevenueNet: number
+  monthExpensesNet: number
+  monthProfitNet: number
+  bankSyncCount: number
 }
 
 export type ChartMonth = {
@@ -98,6 +96,16 @@ export type AiMessage = {
   text: string
   image?: string
   pendingAction?: { type: 'in' | 'out'; value: number; description: string; category: string }
+}
+
+// ─── Toast ───────────────────────────────────────────────────────────────────
+
+export type ToastType = 'success' | 'error' | 'info' | 'warning'
+
+export type Toast = {
+  id: string
+  type: ToastType
+  message: string
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -159,6 +167,11 @@ type DashboardContextType = {
   confirmModal: { msg: string; onOk: () => void } | null
   showConfirm: (msg: string, onOk: () => void) => void
   setConfirmModal: (v: { msg: string; onOk: () => void } | null) => void
+  // Toast
+  toasts: Toast[]
+  showToast: (message: string, type?: ToastType) => void
+  dismissToast: (id: string) => void
+  // Actions
   loadAll: (u: any) => Promise<void>
   loadIntegrations: (userId: string) => Promise<void>
   saveIntegration: (provider: string, providerName: string, token: string, meta?: any) => Promise<boolean>
@@ -226,6 +239,20 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const [confirmModal, setConfirmModal] = useState<{ msg: string; onOk: () => void } | null>(null)
   function showConfirm(msg: string, onOk: () => void) { setConfirmModal({ msg, onOk }) }
 
+  // ── Toast system ─────────────────────────────────────────────────────────
+  const [toasts, setToasts] = useState<Toast[]>([])
+
+  function showToast(message: string, type: ToastType = 'success') {
+    const id = Math.random().toString(36).slice(2)
+    setToasts(prev => [...prev, { id, type, message }])
+    setTimeout(() => dismissToast(id), 3500)
+  }
+
+  function dismissToast(id: string) {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }
+
+  // ── Session check ─────────────────────────────────────────────────────────
   useEffect(() => {
     async function checkSession() {
       const { data: { user }, error } = await supabase.auth.getUser()
@@ -238,11 +265,11 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         .single()
 
       if (!profile?.plano_ativo) {
-  if (typeof window !== 'undefined' && !window.location.pathname.includes('/assinar')) {
-    router.push('/assinar')
-  }
-  return
-}
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/assinar')) {
+          router.push('/assinar')
+        }
+        return
+      }
       if (!profile?.onboarding_done) { router.push('/onboarding'); return }
 
       checkTrial(user, profile)
@@ -263,6 +290,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     if (daysLeft <= 0) setTrialExpired(true)
   }
 
+  // ── loadAll — carga inicial completa ─────────────────────────────────────
   const loadAll = useCallback(async (u: any) => {
     setUser(u)
     const name = u.user_metadata?.name || u.email?.split('@')[0] || 'Usuário'
@@ -271,11 +299,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     setUserBiz(biz)
     setAiMessages((prev: AiMessage[]) => {
       if (prev.length > 1) return prev
-      return [{
-        role: 'ai',
-        text: `Oi, ${name.split(' ')[0]}! 👋 Sou sua IA financeira. Pergunte qualquer coisa sobre o negócio em linguagem normal.`
-    }]
-  })
+      return [{ role: 'ai', text: `Oi, ${name.split(' ')[0]}! 👋 Sou sua IA financeira. Pergunte qualquer coisa sobre o negócio em linguagem normal.` }]
+    })
 
     const { first, last } = monthRange()
     const now = new Date()
@@ -293,52 +318,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       supabase.from('quotes').select('*').eq('user_id', u.id).order('created_at', { ascending: false }),
     ])
 
-    const txs: Transaction[] = resTxMonth.data || []
-
-    // ── Cálculos totais (todas as transações, inclui pessoal) — para compatibilidade
-    const monthRevenue  = txs.filter(t => t.type === 'in').reduce((s, t) => s + t.value, 0)
-    const monthExpenses = txs.filter(t => t.type === 'out').reduce((s, t) => s + t.value, 0)
-    const monthProfit   = monthRevenue - monthExpenses
-
-    // ── Sprint 3: cálculos do NEGÓCIO separando gastos pessoais
-    // is_personal pode ser undefined em transações antigas → trata como false
-    const bizTxs           = txs.filter(t => !t.is_personal)
-    const monthRevenueNet  = bizTxs.filter(t => t.type === 'in').reduce((s, t) => s + t.value, 0)
-    const monthExpensesNet = bizTxs.filter(t => t.type === 'out').reduce((s, t) => s + t.value, 0)
-    const monthProfitNet   = monthRevenueNet - monthExpensesNet
-
-    // ── Sprint 3: contador de transações importadas do banco este mês
-    const bankSyncCount = txs.filter(t => t.source === 'bank_sync').length
-
-    const yearRevenue = (resTxYear.data || []).reduce((s: number, t: any) => s + t.value, 0)
-
-    // Health score usa lucro líquido do negócio
-    const healthScore = Math.min(100, Math.max(0,
-      Math.round((monthProfitNet / (monthRevenueNet || 1)) * 60 + ((81000 - yearRevenue) / 81000) * 40)
-    ))
-
-    setTransactions(txs)
+    applyTransactionData(resTxMonth.data || [], resTxYear.data || [], resChart.data || [])
     setClients(resCli.data || [])
-    setStats({
-      monthRevenue, monthExpenses, monthProfit,
-      yearRevenue, healthScore,
-      monthRevenueNet, monthExpensesNet, monthProfitNet,
-      bankSyncCount,
-    })
-
-    // Chart 6 meses (sem alteração)
-    const allTxs = resChart.data || []
-    const months: ChartMonth[] = Array.from({ length: 6 }, (_, i) => {
-      const d = new Date(); d.setMonth(d.getMonth() - (5 - i))
-      const y = d.getFullYear(); const m = d.getMonth()
-      const label = d.toLocaleString('pt-BR', { month: 'short' }).replace('.', '').replace(/^\w/, c => c.toUpperCase())
-      const key = `${y}-${String(m + 1).padStart(2, '0')}`
-      const rev = allTxs.filter((t: any) => t.date?.startsWith(key) && t.type === 'in').reduce((s: number, t: any) => s + t.value, 0)
-      const exp = allTxs.filter((t: any) => t.date?.startsWith(key) && t.type === 'out').reduce((s: number, t: any) => s + t.value, 0)
-      return { month: label, revenue: rev, expenses: exp }
-    })
-    setChartData(months)
-
     setReceivables((resRec.data || []).map((r: any) => ({
       ...r,
       status: r.status === 'received' ? 'received' : new Date(r.due_date) < new Date() ? 'overdue' : 'pending'
@@ -348,10 +329,66 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       ...q,
       items: typeof q.items === 'string' ? JSON.parse(q.items) : q.items || []
     })))
-
     setLoading(false)
     await loadIntegrations(u.id)
   }, [])
+
+  // ── loadTransactions — recarrega só transações (após lançamento/delete) ──
+  // Evita recarregar clientes, coranças, orçamentos desnecessariamente
+  const loadTransactions = useCallback(async (u: any) => {
+    const { first, last } = monthRange()
+    const now = new Date()
+    const sixMonthsAgo = new Date()
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5)
+    sixMonthsAgo.setDate(1)
+
+    const [resTxMonth, resTxYear, resChart] = await Promise.all([
+      supabase.from('transactions').select('*').eq('user_id', u.id).gte('date', first).lte('date', last).order('created_at', { ascending: false }),
+      supabase.from('transactions').select('value').eq('user_id', u.id).eq('type', 'in').gte('date', `${now.getFullYear()}-01-01`),
+      supabase.from('transactions').select('value,type,date').eq('user_id', u.id).gte('date', sixMonthsAgo.toISOString().split('T')[0]),
+    ])
+
+    applyTransactionData(resTxMonth.data || [], resTxYear.data || [], resChart.data || [])
+  }, [])
+
+  // ── Aplica dados de transações ao estado + recalcula stats ───────────────
+  function applyTransactionData(txMonth: any[], txYear: any[], txChart: any[]) {
+    const txs: Transaction[] = txMonth
+
+    const monthRevenue  = txs.filter(t => t.type === 'in').reduce((s, t) => s + t.value, 0)
+    const monthExpenses = txs.filter(t => t.type === 'out').reduce((s, t) => s + t.value, 0)
+    const monthProfit   = monthRevenue - monthExpenses
+
+    const bizTxs           = txs.filter(t => !t.is_personal)
+    const monthRevenueNet  = bizTxs.filter(t => t.type === 'in').reduce((s, t) => s + t.value, 0)
+    const monthExpensesNet = bizTxs.filter(t => t.type === 'out').reduce((s, t) => s + t.value, 0)
+    const monthProfitNet   = monthRevenueNet - monthExpensesNet
+    const bankSyncCount    = txs.filter(t => t.source === 'bank_sync').length
+    const yearRevenue      = txYear.reduce((s: number, t: any) => s + t.value, 0)
+
+    // Health score: só calcula se tiver dados reais — evita o "40 falso"
+    let healthScore = 0
+    if (monthRevenueNet > 0 || monthExpensesNet > 0) {
+      const marginScore = monthRevenueNet > 0
+        ? Math.round((monthProfitNet / monthRevenueNet) * 60)
+        : 0
+      const limitScore = Math.round(((81000 - yearRevenue) / 81000) * 40)
+      healthScore = Math.min(100, Math.max(0, marginScore + limitScore))
+    }
+
+    setTransactions(txs)
+    setStats({ monthRevenue, monthExpenses, monthProfit, yearRevenue, healthScore, monthRevenueNet, monthExpensesNet, monthProfitNet, bankSyncCount })
+
+    const months: ChartMonth[] = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(); d.setMonth(d.getMonth() - (5 - i))
+      const label = d.toLocaleString('pt-BR', { month: 'short' }).replace('.', '').replace(/^\w/, c => c.toUpperCase())
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      const rev = txChart.filter((t: any) => t.date?.startsWith(key) && t.type === 'in').reduce((s: number, t: any) => s + t.value, 0)
+      const exp = txChart.filter((t: any) => t.date?.startsWith(key) && t.type === 'out').reduce((s: number, t: any) => s + t.value, 0)
+      return { month: label, revenue: rev, expenses: exp }
+    })
+    setChartData(months)
+  }
 
   async function loadIntegrations(userId: string) {
     const { data } = await supabase.from('integrations').select('*').eq('user_id', userId)
@@ -378,70 +415,145 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     await loadIntegrations(user.id)
   }
 
+  // ── Ações otimizadas — usam loadTransactions em vez de loadAll ────────────
+
   async function addTransaction(desc: string, val: number, type: 'in' | 'out', cat: string, date: string) {
-    await supabase.from('transactions').insert({ user_id: user.id, description: desc, value: val, type, category: cat, date: date || todayISO() })
-    await loadAll(user)
+    try {
+      const { error } = await supabase.from('transactions').insert({ user_id: user.id, description: desc, value: val, type, category: cat, date: date || todayISO() })
+      if (error) throw error
+      await loadTransactions(user)
+      showToast(`${type === 'in' ? '↑' : '↓'} ${desc} — ${fmt(val)} lançado!`, 'success')
+    } catch {
+      showToast('Erro ao lançar transação. Tente novamente.', 'error')
+    }
   }
 
   async function deleteTransaction(id: string) {
-    await supabase.from('transactions').delete().eq('id', id)
-    await loadAll(user)
+    try {
+      const { error } = await supabase.from('transactions').delete().eq('id', id)
+      if (error) throw error
+      await loadTransactions(user)
+      showToast('Lançamento removido.', 'info')
+    } catch {
+      showToast('Erro ao remover lançamento.', 'error')
+    }
   }
 
   async function addClient(name: string, phone: string, email: string) {
-    await supabase.from('clients').insert({ user_id: user.id, name, phone, email, total_revenue: 0 })
-    await loadAll(user)
+    try {
+      const { error } = await supabase.from('clients').insert({ user_id: user.id, name, phone, email, total_revenue: 0 })
+      if (error) throw error
+      await loadAll(user)
+      showToast(`Cliente ${name} adicionado.`, 'success')
+    } catch {
+      showToast('Erro ao adicionar cliente.', 'error')
+    }
   }
 
   async function deleteClient(id: string) {
-    await supabase.from('clients').delete().eq('id', id)
-    await loadAll(user)
+    try {
+      const { error } = await supabase.from('clients').delete().eq('id', id)
+      if (error) throw error
+      await loadAll(user)
+      showToast('Cliente removido.', 'info')
+    } catch {
+      showToast('Erro ao remover cliente.', 'error')
+    }
   }
 
   async function addReceivable(clientName: string, desc: string, value: number, dueDate: string) {
-    await supabase.from('receivables').insert({ user_id: user.id, client_name: clientName, description: desc, value, due_date: dueDate, status: 'pending' })
-    await loadAll(user)
+    try {
+      const { error } = await supabase.from('receivables').insert({ user_id: user.id, client_name: clientName, description: desc, value, due_date: dueDate, status: 'pending' })
+      if (error) throw error
+      await loadAll(user)
+      showToast(`Cobrança de ${fmt(value)} criada para ${clientName}.`, 'success')
+    } catch {
+      showToast('Erro ao criar cobrança.', 'error')
+    }
   }
 
   async function markReceivableReceived(id: string, value: number, desc: string) {
-    await supabase.from('receivables').update({ status: 'received' }).eq('id', id)
-    await supabase.from('transactions').insert({ user_id: user.id, description: desc || 'Cobrança recebida', value, type: 'in', category: 'Serviço', date: todayISO() })
-    await loadAll(user)
+    try {
+      await supabase.from('receivables').update({ status: 'received' }).eq('id', id)
+      await supabase.from('transactions').insert({ user_id: user.id, description: desc || 'Cobrança recebida', value, type: 'in', category: 'Serviço', date: todayISO() })
+      await loadAll(user)
+      showToast(`${fmt(value)} recebido e lançado!`, 'success')
+    } catch {
+      showToast('Erro ao registrar recebimento.', 'error')
+    }
   }
 
   async function deleteReceivable(id: string) {
-    await supabase.from('receivables').delete().eq('id', id)
-    await loadAll(user)
+    try {
+      const { error } = await supabase.from('receivables').delete().eq('id', id)
+      if (error) throw error
+      await loadAll(user)
+      showToast('Cobrança removida.', 'info')
+    } catch {
+      showToast('Erro ao remover cobrança.', 'error')
+    }
   }
 
   async function addDasHistory(refMonth: string, value: number, paidDate: string, receipt: string) {
-    await supabase.from('das_history').insert({ user_id: user.id, reference_month: refMonth, value, paid_date: paidDate, receipt_number: receipt })
-    await loadAll(user)
+    try {
+      const { error } = await supabase.from('das_history').insert({ user_id: user.id, reference_month: refMonth, value, paid_date: paidDate, receipt_number: receipt })
+      if (error) throw error
+      await loadAll(user)
+      showToast(`DAS de ${fmt(value)} registrado.`, 'success')
+    } catch {
+      showToast('Erro ao registrar DAS.', 'error')
+    }
   }
 
   async function addQuote(client: string, desc: string, items: QuoteItem[], validUntil: string, notes: string) {
-    const total = items.reduce((s, i) => s + (i.value || 0), 0)
-    await supabase.from('quotes').insert({ user_id: user.id, client_name: client, description: desc, items: JSON.stringify(items), total, valid_until: validUntil || null, status: 'draft', notes })
-    await loadAll(user)
+    try {
+      const total = items.reduce((s, i) => s + (i.value || 0), 0)
+      const { error } = await supabase.from('quotes').insert({ user_id: user.id, client_name: client, description: desc, items: JSON.stringify(items), total, valid_until: validUntil || null, status: 'draft', notes })
+      if (error) throw error
+      await loadAll(user)
+      showToast(`Orçamento para ${client} criado — ${fmt(total)}.`, 'success')
+    } catch {
+      showToast('Erro ao criar orçamento.', 'error')
+    }
   }
 
   async function updateQuoteStatus(id: string, status: Quote['status']) {
-    await supabase.from('quotes').update({ status }).eq('id', id)
-    if (status === 'approved') {
-      const q = quotes.find(x => x.id === id)
-      if (q) await supabase.from('receivables').insert({ user_id: user.id, client_name: q.client_name, description: q.description || 'Orçamento aprovado', value: q.total, due_date: q.valid_until || todayISO(), status: 'pending' })
+    try {
+      await supabase.from('quotes').update({ status }).eq('id', id)
+      if (status === 'approved') {
+        const q = quotes.find(x => x.id === id)
+        if (q) await supabase.from('receivables').insert({ user_id: user.id, client_name: q.client_name, description: q.description || 'Orçamento aprovado', value: q.total, due_date: q.valid_until || todayISO(), status: 'pending' })
+        showToast('Orçamento aprovado e cobrança criada!', 'success')
+      } else {
+        const labels: Record<string, string> = { sent: 'enviado', rejected: 'recusado', draft: 'voltou para rascunho' }
+        showToast(`Orçamento ${labels[status] || status}.`, 'info')
+      }
+      await loadAll(user)
+    } catch {
+      showToast('Erro ao atualizar orçamento.', 'error')
     }
-    await loadAll(user)
   }
 
   async function deleteQuote(id: string) {
-    await supabase.from('quotes').delete().eq('id', id)
-    await loadAll(user)
+    try {
+      const { error } = await supabase.from('quotes').delete().eq('id', id)
+      if (error) throw error
+      await loadAll(user)
+      showToast('Orçamento removido.', 'info')
+    } catch {
+      showToast('Erro ao remover orçamento.', 'error')
+    }
   }
 
   async function saveConfig(name: string, biz: string) {
-    await supabase.auth.updateUser({ data: { name, business_name: biz } })
-    setUserName(name); setUserBiz(biz)
+    try {
+      await supabase.auth.updateUser({ data: { name, business_name: biz } })
+      setUserName(name)
+      setUserBiz(biz)
+      showToast('Configurações salvas!', 'success')
+    } catch {
+      showToast('Erro ao salvar configurações.', 'error')
+    }
   }
 
   async function doLogout() {
@@ -458,6 +570,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       aiMessages, setAiMessages, aiTyping, setAiTyping, chatRef,
       setActiveTab, registerActiveTabSetter,
       confirmModal, showConfirm, setConfirmModal,
+      toasts, showToast, dismissToast,
       loadAll, loadIntegrations, saveIntegration, disconnectIntegration,
       addTransaction, deleteTransaction,
       addClient, deleteClient,

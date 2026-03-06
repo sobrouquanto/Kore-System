@@ -2,33 +2,36 @@
 
 /* ============================================================
    DESIGN TOKENS
-   ============================================================ */
+============================================================ */
+
 :root {
-  --bg:           #060a12;
-  --bg2:          #0d1220;
-  --card:         rgba(255,255,255,0.04);
-  --card-border:  rgba(255,255,255,0.07);
-  --green:        #10b981;
-  --green2:       #059669;
-  --green-dim:    rgba(16,185,129,0.15);
+  --bg: #060a12;
+  --bg2: #0d1220;
+  --card: rgba(255,255,255,0.04);
+  --card-border: rgba(255,255,255,0.07);
+  --green: #10b981;
+  --green2: #059669;
+  --green-dim: rgba(16,185,129,0.15);
   --green-border: rgba(16,185,129,0.25);
-  --red:          #ef4444;
-  --red-dim:      rgba(239,68,68,0.12);
-  --blue:         #3b82f6;
-  --blue-dim:     rgba(59,130,246,0.12);
-  --amber:        #f59e0b;
-  --text:         #f1f5f9;
-  --text2:        rgba(255,255,255,0.55);
-  --text3:        rgba(255,255,255,0.3);
-  --mono:         'DM Mono', monospace;
-  --sans:         'Sora', sans-serif;
-  --sidebar-w:    240px;
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --blue: #3b82f6;
+  --blue-dim: rgba(59,130,246,0.12);
+  --amber: #f59e0b;
+  --text: #f1f5f9;
+  --text2: rgba(255,255,255,0.55);
+  --text3: rgba(255,255,255,0.3);
+  --mono: 'DM Mono', monospace;
+  --sans: 'Sora', sans-serif;
+  --sidebar-w: 240px;
 }
 
 /* ============================================================
    RESET / BASE
-   ============================================================ */
+============================================================ */
+
 *, *::before, *::after { box-sizing: border-box; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -36,28 +39,25 @@ body {
   font-family: var(--sans);
   overflow-x: hidden;
 }
+
 button { font-family: inherit; }
 input, select, textarea { font-family: inherit; }
 
 /* ============================================================
    AMBIENT LIGHT FX
-   ============================================================ */
+============================================================ */
+
 .ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.amb-orb  { position: absolute; border-radius: 50%; }
-.amb-1    { width: 800px; height: 800px; top: -300px; left: 20%;
-            background: radial-gradient(circle, rgba(16,185,129,0.055) 0%, transparent 70%); }
-.amb-2    { width: 600px; height: 600px; bottom: -200px; right: 5%;
-            background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%); }
+.amb-orb { position: absolute; border-radius: 50%; }
+.amb-1 { width: 800px; height: 800px; top: -300px; left: 20%;
+  background: radial-gradient(circle, rgba(16,185,129,0.055) 0%, transparent 70%); }
+.amb-2 { width: 600px; height: 600px; bottom: -200px; right: 5%;
+  background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%); }
 
 /* ============================================================
-   DASHBOARD SHELL — o fix central do bug de largura
-   ============================================================
-   O componente usa .layout / .sidebar / .main / .page-content.
-   O CSS antigo definia .app-shell / .main-content (nomes errados)
-   e não tinha .main nem .page-content — causando o layout ~408px.
-   ============================================================ */
+   DASHBOARD SHELL
+============================================================ */
 
-/* Wrapper raiz: ocupa toda a viewport em flex-row */
 .layout {
   display: flex;
   height: 100vh;
@@ -67,7 +67,6 @@ input, select, textarea { font-family: inherit; }
   background: var(--bg);
 }
 
-/* Sidebar: largura fixa, não encolhe */
 .sidebar {
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
@@ -77,33 +76,30 @@ input, select, textarea { font-family: inherit; }
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* Mobile: posição absoluta sobreposta */
   position: relative;
   z-index: 100;
 }
 
-/* Área principal: ocupa todo o espaço restante */
 .main {
   flex: 1;
-  min-width: 0;          /* evita overflow quando há conteúdo largo */
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  /* Sem overflow aqui: deixa .topbar sticky funcionar e .page-content scrollar */
 }
 
-/* Área de conteúdo da aba ativa: scroll vertical, largura total */
 .page-content {
   flex: 1;
-  min-height: 0;         /* permite que o flex item encolha abaixo do seu conteúdo natural */
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 28px 32px;
-  width: 100%;           /* garante 100% do .main, sem max-width */
+  width: 100%;
 }
 
 /* ============================================================
    SIDEBAR — peças internas
-   ============================================================ */
+============================================================ */
+
 .sidebar-logo {
   padding: 24px 20px 16px;
   display: flex;
@@ -114,7 +110,9 @@ input, select, textarea { font-family: inherit; }
   border-bottom: 1px solid var(--card-border);
   flex-shrink: 0;
 }
+
 .sidebar-logo span { color: var(--green); }
+
 .sidebar-logo-icon {
   width: 34px; height: 34px;
   background: var(--green-dim);
@@ -141,14 +139,17 @@ input, select, textarea { font-family: inherit; }
   flex-shrink: 0;
 }
 
+/* Footer ajustado para o botão de logout caber */
 .sidebar-footer {
-  padding: 14px 16px;
+  padding: 12px 14px;
   border-top: 1px solid var(--card-border);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
+  min-height: 0;
 }
+
 .sidebar-user-avatar {
   width: 32px; height: 32px;
   background: var(--green-dim);
@@ -170,7 +171,8 @@ input, select, textarea { font-family: inherit; }
 
 /* ============================================================
    NAV ITEMS
-   ============================================================ */
+============================================================ */
+
 .nav-item {
   display: flex;
   align-items: center;
@@ -188,16 +190,18 @@ input, select, textarea { font-family: inherit; }
   text-align: left;
   transition: background 0.15s, color 0.15s;
 }
-.nav-item:hover        { background: var(--card); color: var(--text); }
-.nav-item-active       { background: var(--green-dim) !important; color: var(--green) !important; border-color: var(--green-border) !important; }
-.nav-icon              { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
-.nav-label             { flex: 1; }
-.nav-section-label     { font-size: 10px; color: var(--text3); font-weight: 700; letter-spacing: 2px;
-                         text-transform: uppercase; padding: 15px 10px 5px; }
+
+.nav-item:hover { background: var(--card); color: var(--text); }
+.nav-item-active { background: var(--green-dim) !important; color: var(--green) !important; border-color: var(--green-border) !important; }
+.nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-label { flex: 1; }
+.nav-section-label { font-size: 10px; color: var(--text3); font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; padding: 15px 10px 5px; }
 
 /* ============================================================
    TOPBAR
-   ============================================================ */
+============================================================ */
+
 .topbar {
   display: flex;
   align-items: center;
@@ -206,11 +210,8 @@ input, select, textarea { font-family: inherit; }
   border-bottom: 1px solid var(--card-border);
   background: rgba(6,10,18,0.85);
   backdrop-filter: blur(10px);
-  /* sticky via .main que é flex-column — topbar fica fixo no topo enquanto
-     apenas .page-content (flex:1 overflow-y:auto) rola */
   flex-shrink: 0;
   gap: 16px;
-  /* z-index mantido para modais abertos sobre o topbar */
   position: relative;
   z-index: 50;
 }
@@ -220,6 +221,7 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   gap: 24px;
 }
+
 .topbar-stat {
   display: flex;
   flex-direction: column;
@@ -227,7 +229,6 @@ input, select, textarea { font-family: inherit; }
   gap: 2px;
 }
 
-/* Hamburger — visível só no mobile */
 .hamburger {
   display: none;
   background: var(--card);
@@ -242,25 +243,27 @@ input, select, textarea { font-family: inherit; }
 
 /* ============================================================
    CARDS
-   ============================================================ */
+============================================================ */
+
 .card {
   background: var(--card);
   border: 1px solid var(--card-border);
   border-radius: 16px;
   padding: 20px;
 }
-.card-green { background: linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04)); border-color: var(--green-border); }
-.card-blue  { background: rgba(59,130,246,0.06);  border-color: rgba(59,130,246,0.2); }
-.card-red   { background: rgba(239,68,68,0.08);   border-color: rgba(239,68,68,0.2); }
-.card-amber { background: rgba(245,158,11,0.08);  border-color: rgba(245,158,11,0.2); }
 
+.card-green { background: linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04)); border-color: var(--green-border); }
+.card-blue { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.2); }
+.card-red { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); }
+.card-amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
 .card-title { font-size: 11px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
 .card-value { font-size: 28px; font-weight: 800; font-family: var(--mono); line-height: 1.1; margin-top: 8px; }
-.card-sub   { font-size: 12px; color: var(--text3); margin-top: 6px; }
+.card-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
 
 /* ============================================================
    ALERT BANNER
-   ============================================================ */
+============================================================ */
+
 .alert {
   display: flex;
   align-items: flex-start;
@@ -271,39 +274,45 @@ input, select, textarea { font-family: inherit; }
 
 /* ============================================================
    GRIDS
-   ============================================================ */
-.grid-4  { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
-.grid-3  { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-.grid-2  { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
-.grid-21 { display: grid; grid-template-columns: 2fr 1fr;       gap: 16px; }
+============================================================ */
+
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+.grid-21 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
 
 /* ============================================================
    LIMIT BAR
-   ============================================================ */
-.limit-bar      { height: 8px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
+============================================================ */
+
+.limit-bar { height: 8px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
 .limit-bar-fill { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
 
 /* ============================================================
    6-MONTH CHART
-   ============================================================ */
-.chart-container  { display: flex; gap: 6px; align-items: flex-end; }
-.chart-bar-group  { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
-.chart-bars       { display: flex; gap: 3px; width: 100%; }
-.cb               { flex: 1; border-radius: 4px 4px 0 0; min-height: 2px; transition: height 0.6s ease; }
-.chart-label      { font-size: 10px; color: var(--text3); font-weight: 600; white-space: nowrap; }
+============================================================ */
+
+.chart-container { display: flex; gap: 6px; align-items: flex-end; }
+.chart-bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.chart-bars { display: flex; gap: 3px; width: 100%; }
+.cb { flex: 1; border-radius: 4px 4px 0 0; min-height: 2px; transition: height 0.6s ease; }
+.chart-label { font-size: 10px; color: var(--text3); font-weight: 600; white-space: nowrap; }
 
 /* ============================================================
    TRANSACTION TABLE
-   ============================================================ */
+============================================================ */
+
 .table-wrap {
   overflow-x: auto;
   border-radius: 12px;
 }
+
 .table-wrap table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
 }
+
 .table-wrap th {
   text-align: left;
   font-size: 10px;
@@ -314,33 +323,38 @@ input, select, textarea { font-family: inherit; }
   padding: 10px 12px;
   border-bottom: 1px solid var(--card-border);
 }
+
 .table-wrap td {
   padding: 10px 12px;
   border-bottom: 1px solid rgba(255,255,255,0.03);
   vertical-align: middle;
 }
+
 .table-wrap tr:last-child td { border-bottom: none; }
-.tx-in  { color: var(--green); font-family: var(--mono); font-weight: 700; }
-.tx-out { color: var(--red);   font-family: var(--mono); font-weight: 700; }
+.tx-in { color: var(--green); font-family: var(--mono); font-weight: 700; }
+.tx-out { color: var(--red); font-family: var(--mono); font-weight: 700; }
 
 /* ============================================================
    BADGES
-   ============================================================ */
-.badge        { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
-.badge-green  { background: var(--green-dim); color: var(--green); }
-.badge-red    { background: var(--red-dim);   color: var(--red); }
-.badge-amber  { background: rgba(245,158,11,0.15); color: var(--amber); }
-.badge-blue   { background: var(--blue-dim);  color: var(--blue); }
-.badge-gray   { background: rgba(255,255,255,0.07); color: var(--text3); }
+============================================================ */
+
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-red { background: var(--red-dim); color: var(--red); }
+.badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+.badge-blue { background: var(--blue-dim); color: var(--blue); }
+.badge-gray { background: rgba(255,255,255,0.07); color: var(--text3); }
 
 /* ============================================================
    BUTTONS
-   ============================================================ */
+============================================================ */
+
 .btn-primary {
   background: linear-gradient(135deg,var(--green),var(--green2));
   color: #fff; border: none; padding: 10px 20px;
   border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px;
 }
+
 .btn-add {
   background: var(--green-dim);
   border: 1px solid var(--green-border);
@@ -353,8 +367,10 @@ input, select, textarea { font-family: inherit; }
   transition: background 0.15s;
   white-space: nowrap;
 }
-.btn-add:hover    { background: rgba(16,185,129,0.22); }
+
+.btn-add:hover { background: rgba(16,185,129,0.22); }
 .btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .btn-ghost-sm {
   background: var(--card);
   border: 1px solid var(--card-border);
@@ -365,11 +381,13 @@ input, select, textarea { font-family: inherit; }
   font-weight: 600;
   cursor: pointer;
 }
+
 .btn-ghost-sm:hover { background: rgba(255,255,255,0.08); color: var(--text); }
 
 /* ============================================================
    FORMS
-   ============================================================ */
+============================================================ */
+
 .form-group-sm { display: flex; flex-direction: column; gap: 5px; }
 .form-group-sm label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 .form-group-sm input,
@@ -385,39 +403,17 @@ input, select, textarea { font-family: inherit; }
   transition: border-color 0.15s;
   width: 100%;
 }
+
 .form-group-sm input:focus,
 .form-group-sm select:focus,
 .form-group-sm textarea:focus { border-color: var(--green-border); }
+
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 
-/* Select global — garante tema escuro em todos os selects do app */
-select {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--card-border);
-  border-radius: 9px;
-  padding: 9px 12px;
-  color: var(--text);
-  font-size: 13px;
-  font-family: inherit;
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.3)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 32px;
-  transition: border-color 0.15s;
-}
-select:focus { border-color: var(--green-border); }
-select option {
-  background: #111827;
-  color: var(--text);
-}
-
 /* ============================================================
-   TOGGLE GROUP (Entrada / Saída)
-   ============================================================ */
+   TOGGLE GROUP
+============================================================ */
+
 .toggle-group {
   display: flex;
   gap: 4px;
@@ -426,6 +422,7 @@ select option {
   padding: 4px;
   margin-bottom: 14px;
 }
+
 .toggle-btn {
   flex: 1;
   padding: 8px;
@@ -439,6 +436,7 @@ select option {
   font-family: inherit;
   transition: all 0.15s;
 }
+
 .toggle-btn.active {
   background: var(--green-dim);
   color: var(--green);
@@ -447,7 +445,8 @@ select option {
 
 /* ============================================================
    MODAL
-   ============================================================ */
+============================================================ */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -459,6 +458,7 @@ select option {
   z-index: 1000;
   padding: 20px;
 }
+
 .modal {
   background: #111827;
   border: 1px solid var(--card-border);
@@ -471,7 +471,8 @@ select option {
 
 /* ============================================================
    AI CHAT
-   ============================================================ */
+============================================================ */
+
 .chat-messages {
   flex: 1;
   overflow-y: auto;
@@ -481,25 +482,27 @@ select option {
   gap: 16px;
   min-height: 0;
 }
-.msg            { display: flex; gap: 10px; align-items: flex-start; }
-.msg-ai         { flex-direction: row; }
-.msg-avatar     { width: 32px; height: 32px; border-radius: 9px; background: var(--green-dim);
-                  border: 1px solid var(--green-border); display: flex; align-items: center;
-                  justify-content: center; font-size: 14px; flex-shrink: 0; }
-.msg-bubble     { background: var(--card); border: 1px solid var(--card-border);
-                  border-radius: 12px; padding: 10px 14px; font-size: 13px; line-height: 1.55;
-                  max-width: 85%; }
-.msg-user .msg-bubble { background: var(--green-dim); border-color: var(--green-border);
-                        color: var(--text); margin-left: auto; }
 
-.typing-dot     { width: 6px; height: 6px; border-radius: 50%; background: var(--green);
-                  display: inline-block; margin: 0 2px;
-                  animation: typingBounce 1s infinite ease-in-out; }
+.msg { display: flex; gap: 10px; align-items: flex-start; }
+.msg-ai { flex-direction: row; }
+.msg-avatar { width: 32px; height: 32px; border-radius: 9px; background: var(--green-dim);
+  border: 1px solid var(--green-border); display: flex; align-items: center;
+  justify-content: center; font-size: 14px; flex-shrink: 0; }
+.msg-bubble { background: var(--card); border: 1px solid var(--card-border);
+  border-radius: 12px; padding: 10px 14px; font-size: 13px; line-height: 1.55;
+  max-width: 85%; }
+.msg-user .msg-bubble { background: var(--green-dim); border-color: var(--green-border);
+  color: var(--text); margin-left: auto; }
+
+.typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  display: inline-block; margin: 0 2px;
+  animation: typingBounce 1s infinite ease-in-out; }
 .typing-dot:nth-child(2) { animation-delay: 0.15s; }
 .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
 @keyframes typingBounce {
   0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-  40%           { transform: translateY(-5px); opacity: 1; }
+  40% { transform: translateY(-5px); opacity: 1; }
 }
 
 .ai-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 20px 6px; }
@@ -524,6 +527,7 @@ select option {
   align-items: center;
   flex-shrink: 0;
 }
+
 .chat-input {
   flex: 1;
   background: rgba(255,255,255,0.05);
@@ -534,7 +538,9 @@ select option {
   font-size: 13px;
   outline: none;
 }
+
 .chat-input:focus { border-color: var(--green-border); }
+
 .chat-send {
   background: var(--green-dim);
   border: 1px solid var(--green-border);
@@ -547,19 +553,56 @@ select option {
   white-space: nowrap;
   font-family: inherit;
 }
+
 .chat-send:hover { background: rgba(16,185,129,0.22); }
 
 /* ============================================================
    ANIMATIONS
-   ============================================================ */
-@keyframes spin  { to { transform: rotate(360deg); } }
+============================================================ */
+
+@keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 0.9; } }
 
 /* ============================================================
+   TOAST NOTIFICATIONS
+============================================================ */
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(60px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(60px) scale(0.9);
+  }
+}
+
+.toast-enter {
+  animation: toastIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.toast-exit {
+  animation: toastOut 0.2s ease-in forwards;
+}
+
+/* ============================================================
    RESPONSIVE — Mobile (< 768px)
-   ============================================================ */
+============================================================ */
+
 @media (max-width: 768px) {
-  /* Sidebar fica fora da tela por padrão */
+
   .sidebar {
     position: fixed;
     top: 0; left: 0; bottom: 0;
@@ -567,29 +610,21 @@ select option {
     transition: transform 0.25s ease;
     z-index: 200;
   }
+
   .sidebar-open {
     transform: translateX(0);
   }
+
   .sidebar-overlay { display: block; }
-
-  /* Main ocupa tela toda */
   .main { width: 100%; }
-
-  /* Hamburger visível */
   .hamburger { display: block; }
-
-  /* Topbar stats compactos */
   .topbar-stats { gap: 12px; }
-
-  /* Page content com padding menor */
   .page-content { padding: 16px; }
 
-  /* Grids empilham */
   .grid-4,
-  .grid-3  { grid-template-columns: 1fr 1fr; }
-  .grid-21 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
 
-  /* Form rows empilham */
+  .grid-21 { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
 }
 
@@ -597,6 +632,7 @@ select option {
   .grid-4,
   .grid-3,
   .grid-2 { grid-template-columns: 1fr; }
+
   .topbar { padding: 12px 16px; }
   .topbar-stats { display: none; }
 }

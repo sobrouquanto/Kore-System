@@ -87,23 +87,25 @@ export default function AssinarPage() {
     <div style={{
       minHeight: '100vh', background: '#060a12',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: "'Sora', sans-serif", color: '#f1f5f9', padding: '20px',
+      fontFamily: "'Inter', sans-serif", color: '#f1f5f9', padding: '20px',
     }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&display=swap');*{margin:0;padding:0;box-sizing:border-box;}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');*{margin:0;padding:0;box-sizing:border-box;}`}</style>
 
       <BackButton onClick={handleBack} label="Voltar" />
 
       {/* Orbs de fundo */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', width: '600px', height: '600px', top: '-200px', left: '10%', background: 'radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%)', borderRadius: '50%' }} />
+        <div style={{ position: 'absolute', width: '600px', height: '600px', top: '-200px', left: '10%', background: 'radial-gradient(circle, rgba(46,98,255,0.06) 0%, transparent 70%)', borderRadius: '50%' }} />
       </div>
 
       <div style={{ maxWidth: '440px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
 
         {/* Logo */}
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
-          <div style={{ width: '36px', height: '36px', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '15px', color: '#10b981' }}>M</div>
-          <div style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '-0.5px' }}>MEI <span style={{ color: '#10b981' }}>360</span> OS</div>
+          <div style={{ width: '36px', height: '36px', background: 'rgba(46,98,255,0.15)', border: '1px solid rgba(46,98,255,0.25)', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="18" height="18" viewBox="0 0 28 28" fill="none"><path d="M7 6L7 22M7 14L16 6M7 14L16 22" stroke="#2E62FF" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>
+          <div style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '-0.5px' }}>Kore</div>
         </div>
 
         <h1 style={{ fontSize: '30px', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '8px', lineHeight: 1.2 }}>
@@ -116,8 +118,8 @@ export default function AssinarPage() {
 
         {/* Features */}
         <div style={{
-          background: 'linear-gradient(135deg,rgba(16,185,129,0.1),rgba(16,185,129,0.04))',
-          border: '1px solid rgba(16,185,129,0.25)',
+          background: 'linear-gradient(135deg,rgba(46,98,255,0.1),rgba(46,98,255,0.04))',
+          border: '1px solid rgba(46,98,255,0.25)',
           borderRadius: '20px', padding: '28px', marginBottom: '24px', textAlign: 'left',
         }}>
           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '16px' }}>O que está incluído</div>
@@ -148,8 +150,8 @@ export default function AssinarPage() {
         }}>
           <div style={{ textAlign: 'left' }}>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '2px' }}>Após o trial</div>
-            <div style={{ fontSize: '24px', fontWeight: 900, color: '#10b981', fontFamily: 'DM Mono, monospace' }}>
-              R$29<span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Sora, sans-serif' }}>/mês</span>
+            <div style={{ fontSize: '24px', fontWeight: 900, color: '#2E62FF', fontFamily: 'DM Mono, monospace' }}>
+              R$29<span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, system-ui, sans-serif' }}>/mês</span>
             </div>
           </div>
           <div style={{ textAlign: 'right', fontSize: '13px', color: 'rgba(255,255,255,0.35)', lineHeight: 1.5 }}>
@@ -164,10 +166,10 @@ export default function AssinarPage() {
           style={{
             width: '100%', padding: '16px', borderRadius: '14px',
             fontSize: '16px', fontWeight: 800,
-            background: loading ? 'rgba(16,185,129,0.5)' : 'linear-gradient(135deg,#10b981,#059669)',
+            background: loading ? 'rgba(46,98,255,0.5)' : 'linear-gradient(135deg,#2E62FF,#1E4FE8)',
             color: '#fff', border: 'none',
             cursor: loading || !user ? 'not-allowed' : 'pointer',
-            boxShadow: '0 8px 32px rgba(16,185,129,0.3)',
+            boxShadow: '0 8px 32px rgba(46,98,255,0.3)',
             transition: 'all .2s', marginBottom: '12px',
             fontFamily: 'inherit',
           }}

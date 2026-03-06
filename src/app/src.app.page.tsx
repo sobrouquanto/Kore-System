@@ -1,306 +1,751 @@
 'use client'
-import { useRouter } from 'next/navigation'
 
-const CHECKOUT = '/login' // Redireciona para criar conta antes de assinar
+import Link from 'next/link'
 
-export default function LandingPage() {
-  const router = useRouter()
+// ─── K logo inline ────────────────────────────────────────────
+function KLogo({ size = 28 }: { size?: number }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+        <path d="M8 5 L8 27"   stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
+        <path d="M8 16 L24 5"  stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
+        <path d="M8 16 L24 27" stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
+      </svg>
+      <span style={{
+        fontFamily: "'IBM Plex Sans', sans-serif",
+        fontWeight: 800,
+        fontSize: size * 0.65,
+        letterSpacing: '-0.03em',
+        color: '#fff',
+      }}>
+        Kore<span style={{ color: 'rgba(255,255,255,0.35)', fontWeight: 400, fontSize: size * 0.38, letterSpacing: '0.12em', textTransform: 'uppercase', marginLeft: 6 }}>System</span>
+      </span>
+    </div>
+  )
+}
 
-  const goCheckout = () => { router.push('/login?next=assinar') }
+// ─── Dashboard Preview — mock visual do produto ───────────────
+function DashboardPreview() {
+  const bars = [42, 68, 55, 80, 63, 90, 74]
+  const months = ['Ago', 'Set', 'Out', 'Nov', 'Dez', 'Jan', 'Fev']
 
   return (
-    <div style={{ background: '#060a12', color: '#f1f5f9', fontFamily: "'Sora', sans-serif", minHeight: '100vh', overflowX: 'hidden' }}>
+    <div style={{
+      background: '#0d1117',
+      border: '1px solid rgba(255,255,255,0.08)',
+      borderRadius: 16,
+      overflow: 'hidden',
+      fontFamily: "'IBM Plex Mono', monospace",
+    }}>
+      {/* Topbar do mock */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '14px 20px',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(255,255,255,0.02)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <KLogo size={20} />
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#3B82F6', boxShadow: '0 0 8px #3B82F6' }} />
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em' }}>Silva Elétrica</span>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', height: 360 }}>
+        {/* Sidebar mock */}
+        <div style={{
+          width: 52, flexShrink: 0,
+          borderRight: '1px solid rgba(255,255,255,0.05)',
+          padding: '16px 0',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
+        }}>
+          {['⚡','📊','📝','👥','🤖','📈'].map((icon, i) => (
+            <div key={i} style={{
+              width: 32, height: 32, borderRadius: 8,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: i === 0 ? 'rgba(59,130,246,0.15)' : 'transparent',
+              fontSize: 14,
+              border: i === 0 ? '1px solid rgba(59,130,246,0.3)' : '1px solid transparent',
+            }}>
+              {icon}
+            </div>
+          ))}
+        </div>
+
+        {/* Conteúdo principal */}
+        <div style={{ flex: 1, padding: '18px 20px', overflow: 'hidden' }}>
+          {/* KPIs */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 16 }}>
+            {[
+              { label: 'RECEITA / MÊS', value: 'R$ 8.240', color: '#fff', sub: '+12% vs anterior' },
+              { label: 'LUCRO LÍQUIDO', value: 'R$ 3.100', color: '#34d399', sub: 'margem 37,6%' },
+              { label: 'HEALTH SCORE', value: '84 / 100', color: '#3B82F6', sub: '↑ Estável' },
+            ].map(({ label, value, color, sub }) => (
+              <div key={label} style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 10, padding: '12px 14px',
+              }}>
+                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', letterSpacing: '1.5px', fontWeight: 700, marginBottom: 6 }}>{label}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color, letterSpacing: '-0.03em', lineHeight: 1 }}>{value}</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{sub}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Gráfico de barras */}
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            borderRadius: 10, padding: '14px 16px', marginBottom: 14,
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', fontWeight: 700 }}>FATURAMENTO — 7 MESES</span>
+              <span style={{ fontSize: 10, color: '#3B82F6', fontWeight: 700 }}>+31% YoY</span>
+            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 70 }}>
+              {bars.map((h, i) => (
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div style={{
+                    width: '100%', height: h * 0.7,
+                    background: i === 6
+                      ? 'linear-gradient(180deg,#3B82F6,#1d4ed8)'
+                      : 'rgba(59,130,246,0.25)',
+                    borderRadius: '3px 3px 0 0',
+                    border: i === 6 ? '1px solid rgba(59,130,246,0.5)' : 'none',
+                  }} />
+                  <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.3)' }}>{months[i]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Transações recentes */}
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            borderRadius: 10, padding: '12px 16px',
+          }}>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', fontWeight: 700, marginBottom: 10 }}>ÚLTIMAS TRANSAÇÕES</div>
+            {[
+              { desc: 'Serviço residencial — Rua das Flores', val: '+R$ 480', color: '#34d399', date: 'hoje' },
+              { desc: 'Material elétrico — Casa do Parafuso', val: '-R$ 212', color: '#f87171', date: 'ontem' },
+              { desc: 'Manutenção industrial — Fábrica ABC', val: '+R$ 1.200', color: '#34d399', date: '03/02' },
+            ].map(({ desc, val, color, date }) => (
+              <div key={desc} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '7px 0',
+                borderBottom: '1px solid rgba(255,255,255,0.04)',
+              }}>
+                <div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', fontFamily: "'IBM Plex Sans', sans-serif" }}>{desc}</div>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>{date}</div>
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 700, color }}>{val}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Página principal ─────────────────────────────────────────
+export default function LandingPage() {
+  return (
+    <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500;600&display=swap');
-        *{margin:0;padding:0;box-sizing:border-box;}
-        :root{
-          --bg:#060a12;--bg2:#0d1220;
-          --card:rgba(255,255,255,0.04);--card-border:rgba(255,255,255,0.07);
-          --green:#10b981;--green2:#059669;
-          --green-dim:rgba(16,185,129,0.15);--green-border:rgba(16,185,129,0.25);
-          --amber:#f59e0b;
-          --text2:rgba(255,255,255,0.55);--text3:rgba(255,255,255,0.3);
-          --mono:'DM Mono',monospace;--sans:'Sora',sans-serif;
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+          font-family: 'IBM Plex Sans', sans-serif;
+          background: #0B0B0F;
+          color: #f1f5f9;
+          overflow-x: hidden;
         }
-        body{background:var(--bg);font-family:var(--sans);}
-        button{font-family:var(--sans);cursor:pointer;}
-        .btn-ghost{background:transparent;border:1px solid var(--card-border);color:var(--text2);padding:9px 20px;border-radius:10px;font-size:14px;font-weight:600;transition:all .2s;}
-        .btn-ghost:hover{border-color:var(--green);color:var(--green);}
-        .btn-primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:14px;font-weight:700;transition:all .2s;box-shadow:0 4px 20px rgba(16,185,129,0.25);}
-        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(16,185,129,0.35);}
-        .btn-hero{padding:16px 36px!important;border-radius:14px!important;font-size:16px!important;font-weight:800!important;}
-        .btn-hero-outline{background:transparent;border:1px solid var(--card-border);color:var(--text2);padding:16px 28px;border-radius:14px;font-size:15px;font-weight:600;transition:all .2s;cursor:pointer;}
-        .btn-hero-outline:hover{border-color:rgba(255,255,255,0.2);color:#f1f5f9;}
-        .step{background:var(--card);border:1px solid var(--card-border);border-radius:20px;padding:28px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
-        .step:hover{transform:translateY(-4px);border-color:var(--green-border);}
-        .step::before{content:attr(data-n);position:absolute;top:-10px;right:16px;font-size:80px;font-weight:900;color:rgba(255,255,255,0.03);font-family:var(--mono);line-height:1;}
-        .feature{background:var(--card);border:1px solid var(--card-border);border-radius:20px;padding:28px;transition:all .2s;}
-        .feature:hover{border-color:var(--green-border);background:rgba(16,185,129,0.04);}
-        .testimonial{background:var(--card);border:1px solid var(--card-border);border-radius:18px;padding:24px;}
-        .pricing-feat{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:14px;}
-        .pricing-feat::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0;margin-top:1px;}
-        .hero-proof span::before{content:'✓';color:var(--green);font-weight:700;margin-right:6px;}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-        @keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:0.4;}}
-        .fu0{animation:fadeUp .6s ease both;}
-        .fu1{animation:fadeUp .6s .1s ease both;}
-        .fu2{animation:fadeUp .6s .2s ease both;}
-        .fu3{animation:fadeUp .6s .3s ease both;}
-        .fu4{animation:fadeUp .6s .4s ease both;}
-        ::-webkit-scrollbar{width:4px;}
-        ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:99px;}
-        @media(max-width:900px){
-          .nav-links{display:none!important;}
-          .hero-section{padding:80px 20px 60px!important;}
-          .section{padding:60px 20px!important;}
-          .steps-grid,.testimonials-grid{grid-template-columns:1fr!important;}
-          .features-grid{grid-template-columns:1fr!important;}
-          .feature-span{grid-column:span 1!important;grid-template-columns:1fr!important;}
-          .pricing-wrap{padding:20px 20px 60px!important;}
-          .footer{flex-direction:column!important;gap:12px!important;text-align:center!important;padding:30px 20px!important;}
-          .hero-actions{flex-direction:column!important;align-items:center!important;}
-          .preview-grid{grid-template-columns:1fr 1fr!important;}
+
+        .kore-btn-primary {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: #3B82F6;
+          color: #fff;
+          padding: 13px 28px;
+          border-radius: 10px;
+          font-size: 15px; font-weight: 700;
+          text-decoration: none;
+          border: none; cursor: pointer;
+          transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+          font-family: inherit;
+          box-shadow: 0 0 0 rgba(59,130,246,0);
+        }
+        .kore-btn-primary:hover {
+          background: #2563eb;
+          box-shadow: 0 8px 32px rgba(59,130,246,0.35);
+          transform: translateY(-1px);
+        }
+
+        .kore-btn-ghost {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: transparent;
+          color: rgba(255,255,255,0.6);
+          padding: 13px 28px;
+          border-radius: 10px;
+          font-size: 15px; font-weight: 600;
+          text-decoration: none;
+          border: 1px solid rgba(255,255,255,0.12);
+          cursor: pointer;
+          transition: all 0.15s;
+          font-family: inherit;
+        }
+        .kore-btn-ghost:hover {
+          border-color: rgba(255,255,255,0.25);
+          color: #fff;
+          background: rgba(255,255,255,0.04);
+        }
+
+        .nav-link {
+          color: rgba(255,255,255,0.5);
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+          transition: color 0.15s;
+        }
+        .nav-link:hover { color: #fff; }
+
+        .feature-card {
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 14px;
+          padding: 24px;
+          transition: border-color 0.2s, background 0.2s;
+        }
+        .feature-card:hover {
+          border-color: rgba(59,130,246,0.3);
+          background: rgba(59,130,246,0.04);
+        }
+
+        .stat-item {
+          text-align: center;
+          padding: 24px;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+
+        .preview-float {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+          .hero-grid { grid-template-columns: 1fr !important; }
+          .features-grid { grid-template-columns: 1fr 1fr !important; }
+          .nav-links { display: none !important; }
+          .hero-actions { flex-direction: column; align-items: flex-start !important; }
+        }
+
+        @media (max-width: 480px) {
+          .features-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
-      {/* AMBIENT */}
-      <div style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:0,overflow:'hidden'}}>
-        <div style={{position:'absolute',width:'800px',height:'800px',top:'-300px',left:'20%',background:'radial-gradient(circle,rgba(16,185,129,0.055) 0%,transparent 70%)',borderRadius:'50%'}}/>
-        <div style={{position:'absolute',width:'600px',height:'600px',bottom:'-200px',right:'5%',background:'radial-gradient(circle,rgba(59,130,246,0.04) 0%,transparent 70%)',borderRadius:'50%'}}/>
-        <div style={{position:'absolute',width:'400px',height:'400px',top:'40%',left:'-100px',background:'radial-gradient(circle,rgba(139,92,246,0.03) 0%,transparent 70%)',borderRadius:'50%'}}/>
-      </div>
+      <div style={{ background: '#0B0B0F', minHeight: '100vh' }}>
 
-      {/* NAV */}
-      <nav style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'20px 60px',position:'sticky',top:0,zIndex:100,background:'rgba(6,10,18,0.85)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
-        <div style={{fontSize:'18px',fontWeight:800,letterSpacing:'-0.5px'}}>MEI <span style={{color:'#10b981'}}>360</span> OS</div>
-        <div className="nav-links" style={{display:'flex',gap:'32px'}}>
-          {[['#como-funciona','Como funciona'],['#funcionalidades','Funcionalidades'],['#preco','Preço']].map(([h,l])=>(
-            <a key={h} href={h} style={{color:'rgba(255,255,255,0.55)',textDecoration:'none',fontSize:'14px',fontWeight:500,transition:'color .2s'}}
-              onMouseEnter={e=>(e.target as any).style.color='#f1f5f9'}
-              onMouseLeave={e=>(e.target as any).style.color='rgba(255,255,255,0.55)'}>{l}</a>
-          ))}
+        {/* ── Orbs de fundo ── */}
+        <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+          <div style={{
+            position: 'absolute', width: 900, height: 900,
+            top: -400, left: '30%',
+            background: 'radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 60%)',
+            borderRadius: '50%',
+          }} />
+          <div style={{
+            position: 'absolute', width: 600, height: 600,
+            bottom: -200, right: '5%',
+            background: 'radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 60%)',
+            borderRadius: '50%',
+          }} />
+          {/* Grid pattern */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
+          }} />
         </div>
-        <div style={{display:'flex',gap:'12px',alignItems:'center'}}>
-          <button className="btn-ghost" onClick={()=>router.push('/login')}>Entrar</button>
-          <button className="btn-primary" onClick={goCheckout}>Assinar R$29/mês →</button>
-        </div>
-      </nav>
 
-      {/* HERO */}
-      <section className="hero-section" style={{padding:'120px 60px 80px',textAlign:'center',maxWidth:'860px',margin:'0 auto',position:'relative',zIndex:1}}>
-        <div className="fu0" style={{display:'inline-flex',alignItems:'center',gap:'8px',background:'var(--green-dim)',border:'1px solid var(--green-border)',color:'#10b981',padding:'6px 16px',borderRadius:'99px',fontSize:'12px',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',marginBottom:'28px'}}>
-          <span style={{width:'6px',height:'6px',borderRadius:'50%',background:'#10b981',animation:'pulse-dot 2s infinite',display:'inline-block'}}/>
-          🚀 Novo · IA financeira para MEI
-        </div>
-        <h1 className="fu1" style={{fontSize:'clamp(40px,6vw,72px)',fontWeight:900,lineHeight:1.08,letterSpacing:'-2px',marginBottom:'24px'}}>
-          O <em style={{fontStyle:'normal',color:'#10b981'}}>sistema operacional</em><br/>inteligente do seu negócio
-        </h1>
-        <p className="fu2" style={{fontSize:'18px',color:'rgba(255,255,255,0.55)',lineHeight:1.7,maxWidth:'560px',margin:'0 auto 40px'}}>
-          Você foca em trabalhar. O MEI 360 OS cuida do resto — finanças, cobranças, impostos e IA que fala a língua do empreendedor brasileiro.
-        </p>
-        <div className="fu3 hero-actions" style={{display:'flex',gap:'14px',justifyContent:'center',flexWrap:'wrap'}}>
-          <button className="btn-primary btn-hero" onClick={goCheckout}>Assinar por R$29/mês →</button>
-          <button className="btn-hero-outline" onClick={()=>router.push('/login')}>Ver o app →</button>
-        </div>
-        <div className="fu4" style={{display:'flex',alignItems:'center',gap:'20px',justifyContent:'center',marginTop:'32px',fontSize:'13px',color:'rgba(255,255,255,0.3)',flexWrap:'wrap'}}>
-          <span className="hero-proof">Sem fidelidade</span>
-          <span className="hero-proof">Cancele quando quiser</span>
-          <span className="hero-proof">Suporte em português</span>
-        </div>
-      </section>
+        {/* ── NAV ── */}
+        <nav style={{
+          position: 'sticky', top: 0, zIndex: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 40px', height: 64,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          background: 'rgba(11,11,15,0.88)',
+          backdropFilter: 'blur(16px)',
+        }}>
+          <KLogo size={26} />
 
-      {/* APP PREVIEW */}
-      <div style={{maxWidth:'1000px',margin:'0 auto 100px',padding:'0 40px',position:'relative',zIndex:1}}>
-        <div style={{background:'#0d1220',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'20px',overflow:'hidden',boxShadow:'0 40px 100px rgba(0,0,0,0.6),0 0 0 1px rgba(16,185,129,0.08),inset 0 1px 0 rgba(255,255,255,0.05)'}}>
-          <div style={{background:'rgba(255,255,255,0.03)',padding:'12px 20px',borderBottom:'1px solid rgba(255,255,255,0.07)',display:'flex',alignItems:'center',gap:'10px'}}>
-            <div style={{display:'flex',gap:'6px'}}>
-              {['#ef4444','#f59e0b','#22c55e'].map(c=><div key={c} style={{width:'10px',height:'10px',borderRadius:'50%',background:c}}/>)}
-            </div>
-            <div style={{flex:1,textAlign:'center',background:'rgba(255,255,255,0.05)',borderRadius:'6px',padding:'4px 16px',fontSize:'12px',color:'rgba(255,255,255,0.3)',fontFamily:'DM Mono,monospace'}}>mei360os.vercel.app</div>
+          <div className="nav-links" style={{ display: 'flex', gap: 32 }}>
+            <a href="#funcionalidades" className="nav-link">Funcionalidades</a>
+            <a href="#precos" className="nav-link">Preços</a>
+            <a href="#como-funciona" className="nav-link">Como funciona</a>
           </div>
-          <div className="preview-grid" style={{padding:'24px',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'14px'}}>
-            <div style={{background:'var(--green-dim)',border:'1px solid var(--green-border)',borderRadius:'12px',padding:'16px'}}>
-              <div style={{fontSize:'10px',color:'rgba(255,255,255,0.3)',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'8px'}}>Saldo Hoje</div>
-              <div style={{fontSize:'20px',fontWeight:800,fontFamily:'DM Mono,monospace',color:'#10b981'}}>R$4.820</div>
-              <div style={{fontSize:'11px',color:'rgba(255,255,255,0.3)',marginTop:'4px'}}>↑ R$380 entrou hoje</div>
+
+          <div style={{ display: 'flex', gap: 10 }}>
+            <Link href="/login" className="kore-btn-ghost" style={{ padding: '8px 18px', fontSize: 14 }}>
+              Entrar
+            </Link>
+            <Link href="/login?mode=signup" className="kore-btn-primary" style={{ padding: '8px 18px', fontSize: 14 }}>
+              Começar grátis
+            </Link>
+          </div>
+        </nav>
+
+        {/* ── HERO ── */}
+        <section style={{
+          position: 'relative', zIndex: 1,
+          maxWidth: 1200, margin: '0 auto',
+          padding: '80px 40px 60px',
+        }}>
+          <div className="hero-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 64,
+            alignItems: 'center',
+          }}>
+            {/* Texto */}
+            <div>
+              {/* Pill */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                background: 'rgba(59,130,246,0.08)',
+                border: '1px solid rgba(59,130,246,0.2)',
+                borderRadius: 99, padding: '5px 14px',
+                marginBottom: 28,
+              }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#3B82F6', animation: 'float 2s ease-in-out infinite' }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#93c5fd', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'IBM Plex Mono', monospace" }}>
+                  Gestão financeira para MEI
+                </span>
+              </div>
+
+              <h1 style={{
+                fontSize: 'clamp(2.2rem, 4vw, 3.4rem)',
+                fontWeight: 800,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.06,
+                marginBottom: 24,
+                color: '#fff',
+              }}>
+                O núcleo financeiro<br />
+                <span style={{
+                  color: 'transparent',
+                  backgroundImage: 'linear-gradient(135deg, #60a5fa, #3B82F6)',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                }}>do seu negócio.</span>
+              </h1>
+
+              <p style={{
+                fontSize: 17,
+                color: 'rgba(255,255,255,0.52)',
+                lineHeight: 1.7,
+                marginBottom: 36,
+                maxWidth: 460,
+              }}>
+                Sistema completo de gestão para MEI. Controle de caixa, IA financeira,
+                alertas de DAS e relatórios — tudo integrado, tudo automático.
+              </p>
+
+              <div className="hero-actions" style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                <Link href="/login?mode=signup" className="kore-btn-primary" style={{ fontSize: 16, padding: '14px 32px' }}>
+                  Começar gratuitamente →
+                </Link>
+                <a href="#como-funciona" className="kore-btn-ghost" style={{ fontSize: 16, padding: '14px 24px' }}>
+                  Ver demo
+                </a>
+              </div>
+
+              <div style={{ marginTop: 20, display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                {['14 dias grátis', 'Sem cartão de crédito', 'Cancele quando quiser'].map(t => (
+                  <span key={t} style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ color: '#3B82F6', fontWeight: 700 }}>✓</span> {t}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div style={{background:'var(--card)',border:'1px solid var(--card-border)',borderRadius:'12px',padding:'16px'}}>
-              <div style={{fontSize:'10px',color:'rgba(255,255,255,0.3)',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'8px'}}>Lucro do Mês</div>
-              <div style={{fontSize:'20px',fontWeight:800,fontFamily:'DM Mono,monospace',color:'#6ee7b7'}}>R$6.160</div>
-              <div style={{fontSize:'11px',color:'rgba(255,255,255,0.3)',marginTop:'4px'}}>66% de margem 🎯</div>
+
+            {/* Preview */}
+            <div className="preview-float" style={{ position: 'relative' }}>
+              {/* Glow atrás */}
+              <div style={{
+                position: 'absolute', inset: -40,
+                background: 'radial-gradient(ellipse at center, rgba(59,130,246,0.15) 0%, transparent 70%)',
+                borderRadius: '50%',
+                zIndex: -1,
+              }} />
+              <DashboardPreview />
             </div>
-            <div style={{background:'rgba(245,158,11,0.1)',border:'1px solid rgba(245,158,11,0.2)',borderRadius:'12px',padding:'16px'}}>
-              <div style={{fontSize:'10px',color:'rgba(255,255,255,0.3)',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'8px'}}>Limite MEI</div>
-              <div style={{fontSize:'20px',fontWeight:800,fontFamily:'DM Mono,monospace',color:'#f59e0b'}}>58%</div>
-              <div style={{fontSize:'11px',color:'rgba(255,255,255,0.3)',marginTop:'4px'}}>R$47.200 / R$81.000</div>
+          </div>
+        </section>
+
+        {/* ── NÚMEROS ── */}
+        <section style={{
+          position: 'relative', zIndex: 1,
+          borderTop: '1px solid rgba(255,255,255,0.05)',
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+          background: 'rgba(255,255,255,0.015)',
+        }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}>
+              {[
+                { n: 'R$ 81k', label: 'Limite MEI 2025', sub: 'Controlado automaticamente' },
+                { n: '< 2min', label: 'Para lançar via IA', sub: 'Foto → transação categorizada' },
+                { n: '100%', label: 'Rastreabilidade', sub: 'Entradas e saídas auditáveis' },
+                { n: 'R$ 29', label: 'Por mês', sub: '14 dias de trial gratuito' },
+              ].map(({ n, label, sub }) => (
+                <div key={label} className="stat-item" style={{
+                  borderRight: '1px solid rgba(255,255,255,0.05)',
+                  padding: '32px 24px',
+                }}>
+                  <div style={{
+                    fontSize: 32, fontWeight: 800,
+                    letterSpacing: '-0.04em',
+                    color: '#fff',
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    marginBottom: 6,
+                  }}>{n}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>{sub}</div>
+                </div>
+              ))}
             </div>
-            <div style={{background:'var(--card)',border:'1px solid var(--card-border)',borderRadius:'12px',padding:'16px',gridColumn:'span 2'}}>
-              <div style={{fontSize:'11px',color:'rgba(255,255,255,0.35)',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'8px'}}>Receita × Despesas (6 meses)</div>
-              <div style={{display:'flex',alignItems:'flex-end',gap:'5px',height:'60px',overflow:'hidden'}}>
-                {[{r:45,e:28},{r:62,e:35},{r:55,e:30},{r:78,e:42},{r:70,e:38},{r:90,e:45}].map((d,i)=>(
-                  <div key={i} style={{flex:1,display:'flex',gap:'3px',alignItems:'flex-end',height:'60px'}}>
-                    <div style={{flex:1,borderRadius:'3px 3px 0 0',background:i===5?'linear-gradient(180deg,#6ee7b7,#10b981)':'rgba(255,255,255,0.12)',height:`${(d.r/90)*58}px`}}/>
-                    <div style={{flex:1,borderRadius:'3px 3px 0 0',background:i===5?'rgba(239,68,68,0.6)':'rgba(239,68,68,0.25)',height:`${(d.e/90)*58}px`}}/>
+          </div>
+        </section>
+
+        {/* ── COMO FUNCIONA ── */}
+        <section id="como-funciona" style={{
+          position: 'relative', zIndex: 1,
+          maxWidth: 1200, margin: '0 auto',
+          padding: '100px 40px',
+        }}>
+          <div style={{ maxWidth: 560, marginBottom: 60 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'IBM Plex Mono', monospace", marginBottom: 14 }}>
+              COMO FUNCIONA
+            </div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+              Três passos para ter controle financeiro real.
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2 }}>
+            {[
+              {
+                n: '01',
+                title: 'Crie sua conta',
+                desc: 'Cadastro em 2 minutos. Sem burocracia, sem cartão. Você tem 14 dias para testar tudo.',
+                icon: (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+                  </svg>
+                ),
+              },
+              {
+                n: '02',
+                title: 'Conecte seu banco',
+                desc: 'Sincronização automática via Open Finance (Pluggy). Suas transações entram sem você digitar nada.',
+                icon: (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                  </svg>
+                ),
+              },
+              {
+                n: '03',
+                title: 'Tome decisões',
+                desc: 'Dashboard em tempo real, alertas de DAS, IA que responde dúvidas financeiras. Você vê tudo.',
+                icon: (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                  </svg>
+                ),
+              },
+            ].map(({ n, title, desc, icon }, i) => (
+              <div key={n} style={{
+                padding: '36px 32px',
+                borderLeft: i === 0 ? '1px solid rgba(255,255,255,0.07)' : 'none',
+                borderRight: '1px solid rgba(255,255,255,0.07)',
+                borderTop: '1px solid rgba(255,255,255,0.07)',
+                borderBottom: '1px solid rgba(255,255,255,0.07)',
+                position: 'relative',
+              }}>
+                <div style={{
+                  position: 'absolute', top: 28, right: 28,
+                  fontSize: 11, fontWeight: 700,
+                  color: 'rgba(255,255,255,0.12)',
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  letterSpacing: '0.1em',
+                }}>{n}</div>
+
+                <div style={{
+                  width: 44, height: 44,
+                  background: 'rgba(59,130,246,0.1)',
+                  border: '1px solid rgba(59,130,246,0.2)',
+                  borderRadius: 12,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginBottom: 20,
+                }}>
+                  {icon}
+                </div>
+
+                <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 10 }}>{title}</div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>{desc}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── FUNCIONALIDADES ── */}
+        <section id="funcionalidades" style={{
+          position: 'relative', zIndex: 1,
+          background: 'rgba(255,255,255,0.015)',
+          borderTop: '1px solid rgba(255,255,255,0.05)',
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+        }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 40px' }}>
+            <div style={{ maxWidth: 560, marginBottom: 60 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'IBM Plex Mono', monospace", marginBottom: 14 }}>
+                FUNCIONALIDADES
+              </div>
+              <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+                Tudo que você precisa.<br />Nada que você não vai usar.
+              </h2>
+            </div>
+
+            <div className="features-grid" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 16,
+            }}>
+              {[
+                { icon: '📊', title: 'Fluxo de caixa em tempo real', desc: 'Entradas e saídas sincronizadas com seu banco. Saldo atualizado automaticamente.' },
+                { icon: '🤖', title: 'IA Financeira integrada', desc: 'Lança transações por foto, responde perguntas financeiras, detecta anomalias no seu caixa.' },
+                { icon: '📅', title: 'Alertas de DAS', desc: 'Nunca perca o vencimento do imposto. Valor calculado automaticamente todo mês.' },
+                { icon: '📈', title: 'Relatórios anuais + DASN', desc: 'Tudo que o contador precisa, gerado em segundos. Faturamento por categoria, anual e mensal.' },
+                { icon: '🔗', title: 'Open Finance (Pluggy)', desc: 'Conexão bancária segura sem compartilhar senha. Funciona com os principais bancos do Brasil.' },
+                { icon: '👥', title: 'Clientes e orçamentos', desc: 'Cadastro de clientes, emissão de orçamentos e controle de cobranças em aberto.' },
+              ].map(({ icon, title, desc }) => (
+                <div key={title} className="feature-card">
+                  <div style={{ fontSize: 26, marginBottom: 14 }}>{icon}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8, letterSpacing: '-0.02em' }}>{title}</div>
+                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.42)', lineHeight: 1.7 }}>{desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── ANTI-PLANILHA ── */}
+        <section style={{
+          position: 'relative', zIndex: 1,
+          maxWidth: 1200, margin: '0 auto',
+          padding: '100px 40px',
+        }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'IBM Plex Mono', monospace", marginBottom: 14 }}>
+                ANTI-PLANILHA
+              </div>
+              <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 24 }}>
+                Gestão financeira não é talento.<br />
+                <span style={{ color: '#3B82F6' }}>É ferramenta.</span>
+              </h2>
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', lineHeight: 1.8, marginBottom: 32 }}>
+                Empresas grandes têm CFO, contador e ERP. O MEI tem a Kore. 
+                Um sistema que alerta antes do problema virar crise e responde em segundos o que 
+                antes levava uma tarde de planilha para descobrir.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {[
+                  'Chega de planilha. Começa o controle.',
+                  'Seu negócio merece um sistema. Não uma aba do Excel.',
+                  'O dinheiro do seu negócio tem destino. A Kore mostra qual é.',
+                ].map(t => (
+                  <div key={t} style={{
+                    display: 'flex', gap: 12, alignItems: 'flex-start',
+                    padding: '12px 16px',
+                    background: 'rgba(59,130,246,0.04)',
+                    border: '1px solid rgba(59,130,246,0.12)',
+                    borderRadius: 10,
+                  }}>
+                    <span style={{ color: '#3B82F6', fontWeight: 700, flexShrink: 0, marginTop: 1 }}>→</span>
+                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.5 }}>{t}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div style={{background:'linear-gradient(135deg,rgba(59,130,246,0.12),rgba(16,185,129,0.08))',border:'1px solid rgba(59,130,246,0.2)',borderRadius:'12px',padding:'16px'}}>
-              <div style={{fontSize:'11px',color:'rgba(255,255,255,0.35)',letterSpacing:'1px',marginBottom:'10px'}}>🤖 IA ASSISTENTE</div>
-              <div style={{fontSize:'12px',color:'rgba(255,255,255,0.7)',lineHeight:1.6,background:'rgba(255,255,255,0.05)',borderRadius:'8px',padding:'10px'}}>
-                "Você pode retirar <strong style={{color:'#10b981'}}>R$4.300</strong> este mês sem comprometer o negócio." 💚
+
+            {/* Comparativo */}
+            <div style={{
+              background: '#0d1117',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 16, overflow: 'hidden',
+              fontFamily: "'IBM Plex Mono', monospace",
+            }}>
+              {/* Header */}
+              <div style={{
+                display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+                background: 'rgba(255,255,255,0.04)',
+                borderBottom: '1px solid rgba(255,255,255,0.07)',
+              }}>
+                <div style={{ padding: '12px 16px', fontSize: 11, color: 'rgba(255,255,255,0.3)', fontWeight: 700, letterSpacing: '1px' }}>FUNCIONALIDADE</div>
+                <div style={{ padding: '12px 16px', fontSize: 11, color: '#f87171', fontWeight: 700, letterSpacing: '1px', borderLeft: '1px solid rgba(255,255,255,0.07)' }}>PLANILHA</div>
+                <div style={{ padding: '12px 16px', fontSize: 11, color: '#3B82F6', fontWeight: 700, letterSpacing: '1px', borderLeft: '1px solid rgba(255,255,255,0.07)' }}>KORE</div>
               </div>
-              <div style={{fontSize:'11px',color:'rgba(255,255,255,0.35)',marginTop:'8px'}}>Perguntado: "Quanto posso retirar?"</div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* HOW IT WORKS */}
-      <section id="como-funciona" className="section" style={{padding:'80px 60px',maxWidth:'1100px',margin:'0 auto',position:'relative',zIndex:1}}>
-        <div style={{fontSize:'11px',color:'#10b981',fontWeight:700,letterSpacing:'3px',textTransform:'uppercase',textAlign:'center',marginBottom:'14px'}}>Como funciona</div>
-        <h2 style={{fontSize:'clamp(28px,4vw,44px)',fontWeight:800,letterSpacing:'-1px',textAlign:'center',marginBottom:'16px',lineHeight:1.15}}>Em 30 segundos você sabe<br/>como está seu negócio</h2>
-        <p style={{fontSize:'16px',color:'rgba(255,255,255,0.55)',textAlign:'center',maxWidth:'520px',margin:'0 auto 60px'}}>Sem planilha, sem contador, sem complicação. Simples como deve ser.</p>
-        <div className="steps-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'24px'}}>
-          {[
-            {n:'01',icon:'🔗',title:'Conecte suas ferramentas',text:'Mercado Pago, banco, WhatsApp, iFood. Tudo que você já usa entra automático — zero digitação manual.'},
-            {n:'02',icon:'⚡',title:'A IA organiza tudo',text:'Cada venda, gasto e cobrança é categorizado e lançado automaticamente. O sistema pensa enquanto você trabalha.'},
-            {n:'03',icon:'📊',title:'Decida com dados reais',text:'Veja lucro real, alerta do DAS, quando bate o limite e quanto pode retirar. Tudo em linguagem humana.'},
-          ].map(s=>(
-            <div key={s.n} className="step" data-n={s.n}>
-              <div style={{fontSize:'32px',marginBottom:'16px'}}>{s.icon}</div>
-              <div style={{fontSize:'16px',fontWeight:700,marginBottom:'8px'}}>{s.title}</div>
-              <div style={{fontSize:'14px',color:'rgba(255,255,255,0.55)',lineHeight:1.6}}>{s.text}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section id="funcionalidades" className="section" style={{padding:'80px 60px',maxWidth:'1100px',margin:'0 auto',position:'relative',zIndex:1}}>
-        <div style={{fontSize:'11px',color:'#10b981',fontWeight:700,letterSpacing:'3px',textTransform:'uppercase',textAlign:'center',marginBottom:'14px'}}>Funcionalidades</div>
-        <h2 style={{fontSize:'clamp(28px,4vw,44px)',fontWeight:800,letterSpacing:'-1px',textAlign:'center',marginBottom:'16px',lineHeight:1.15}}>Tudo que um MEI precisa.<br/>Nada que não precisa.</h2>
-        <p style={{fontSize:'16px',color:'rgba(255,255,255,0.55)',textAlign:'center',maxWidth:'520px',margin:'0 auto 60px'}}>Construído pensando no dia a dia de quem trabalha de verdade.</p>
-        <div className="features-grid" style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'20px'}}>
-          <div className="feature feature-span" style={{gridColumn:'span 2',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'28px',alignItems:'center'}}>
-            <div>
-              <div style={{display:'inline-block',background:'var(--green-dim)',color:'#10b981',border:'1px solid var(--green-border)',padding:'3px 10px',borderRadius:'99px',fontSize:'11px',fontWeight:700,marginBottom:'10px',letterSpacing:'.5px'}}>⭐ DESTAQUE</div>
-              <div style={{fontSize:'28px',marginBottom:'12px'}}>🤖</div>
-              <div style={{fontSize:'18px',fontWeight:700,marginBottom:'8px'}}>IA que fala brasileiro</div>
-              <div style={{fontSize:'14px',color:'rgba(255,255,255,0.55)',lineHeight:1.65}}>Converse com a IA como se fosse um contador amigo. "Recebi R$800 do João" → lançado. "Quanto gastei este mês?" → resposta na hora. Sem jargão técnico, sem complicação.</div>
-            </div>
-            <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'14px',padding:'20px'}}>
-              <div style={{fontSize:'11px',color:'rgba(255,255,255,0.3)',marginBottom:'12px',letterSpacing:'1px'}}>CONVERSA REAL COM A IA</div>
-              <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                <div style={{background:'rgba(255,255,255,0.06)',padding:'10px 12px',borderRadius:'4px 12px 12px 12px',fontSize:'13px',maxWidth:'85%'}}>Quando vou bater o limite do MEI? 📊</div>
-                <div style={{background:'linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.08))',border:'1px solid rgba(16,185,129,0.2)',padding:'10px 12px',borderRadius:'12px 12px 12px 4px',fontSize:'13px',lineHeight:1.5,color:'rgba(255,255,255,0.85)'}}>
-                  No ritmo atual, você bate o limite em <strong style={{color:'#10b981'}}>~3 meses</strong>. Recomendo pesquisar migração para ME. Quer que eu simule? 🎯
+              {[
+                ['Sync bancário automático', '✗', '✓'],
+                ['Alertas de imposto', '✗', '✓'],
+                ['IA financeira', '✗', '✓'],
+                ['Relatório anual', 'Manual', '✓ Auto'],
+                ['Acesso mobile', 'Limitado', '✓ Full'],
+                ['Tempo p/ lançar', '~10 min', '< 2 min'],
+              ].map(([feat, sem, com], i) => (
+                <div key={feat as string} style={{
+                  display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+                  borderBottom: i < 5 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                }}>
+                  <div style={{ padding: '11px 16px', fontSize: 12, color: 'rgba(255,255,255,0.5)', fontFamily: "'IBM Plex Sans', sans-serif" }}>{feat}</div>
+                  <div style={{ padding: '11px 16px', fontSize: 12, color: '#f87171', fontWeight: 700, borderLeft: '1px solid rgba(255,255,255,0.04)' }}>{sem}</div>
+                  <div style={{ padding: '11px 16px', fontSize: 12, color: '#34d399', fontWeight: 700, borderLeft: '1px solid rgba(255,255,255,0.04)' }}>{com}</div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
-          {[
-            {icon:'🖥️',title:'Cockpit Diário',text:'Abra o app e em 30 segundos veja saldo, o que receber hoje, o que pagar e as 3 tarefas mais importantes geradas pela IA.'},
-            {icon:'💰',title:'Financeiro Inteligente',text:'Fluxo de caixa automático, separação de lucro/custos/impostos e relatório mensal em linguagem simples. Sem planilha.'},
-            {icon:'⚠️',title:'Alerta do DAS + Limite',text:'Nunca mais leve multa por esquecer o DAS. E saiba com antecedência quando vai bater o limite anual de faturamento do MEI.'},
-            {icon:'🔗',title:'Hub de Integrações',text:'Mercado Pago, Pix, Nubank, Inter, WhatsApp Business, iFood, Shopee. Tudo que você já usa entra automático.'},
-            {icon:'📈',title:'Inteligência de Negócio',text:'Simulador de preço, projeção de crescimento, análise de sazonalidade e ranking de clientes. Decida com dados, não no feeling.'},
-          ].map(f=>(
-            <div key={f.title} className="feature">
-              <div style={{fontSize:'28px',marginBottom:'12px'}}>{f.icon}</div>
-              <div style={{fontSize:'18px',fontWeight:700,marginBottom:'8px'}}>{f.title}</div>
-              <div style={{fontSize:'14px',color:'rgba(255,255,255,0.55)',lineHeight:1.65}}>{f.text}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+        </section>
 
-      {/* PRICING */}
-      <section id="preco" style={{padding:'80px 60px 20px',maxWidth:'1100px',margin:'0 auto',position:'relative',zIndex:1}}>
-        <div style={{fontSize:'11px',color:'#10b981',fontWeight:700,letterSpacing:'3px',textTransform:'uppercase',textAlign:'center',marginBottom:'14px'}}>Preço</div>
-        <h2 style={{fontSize:'clamp(28px,4vw,44px)',fontWeight:800,letterSpacing:'-1px',textAlign:'center',marginBottom:'16px',lineHeight:1.15}}>Um plano. Tudo incluído.<br/>Sem surpresa.</h2>
-        <p style={{fontSize:'16px',color:'rgba(255,255,255,0.55)',textAlign:'center',maxWidth:'520px',margin:'0 auto'}}>Pelo preço de um café por semana, seu negócio nunca mais fica no escuro.</p>
-      </section>
-      <div className="pricing-wrap" style={{display:'flex',justifyContent:'center',padding:'40px 60px 80px',position:'relative',zIndex:1}}>
-        <div style={{background:'linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04))',border:'1px solid rgba(16,185,129,0.25)',borderRadius:'28px',padding:'48px 56px',maxWidth:'520px',width:'100%',textAlign:'center',position:'relative',overflow:'hidden'}}>
-          <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:'linear-gradient(90deg,transparent,#10b981,transparent)'}}/>
-          <div style={{display:'inline-block',background:'#10b981',color:'#fff',padding:'5px 16px',borderRadius:'99px',fontSize:'11px',fontWeight:800,letterSpacing:'1px',textTransform:'uppercase',marginBottom:'24px'}}>✦ PLANO ÚNICO</div>
-          <div style={{fontSize:'14px',color:'rgba(255,255,255,0.55)',fontWeight:600,letterSpacing:'2px',textTransform:'uppercase',marginBottom:'12px'}}>MEI 360 OS Completo</div>
-          <div style={{fontSize:'64px',fontWeight:900,fontFamily:'DM Mono,monospace',lineHeight:1,color:'#10b981'}}>
-            <sup style={{fontSize:'24px',verticalAlign:'top',marginTop:'12px',color:'rgba(255,255,255,0.55)',fontFamily:'Sora,sans-serif'}}>R$</sup>
-            29
-            <sub style={{fontSize:'16px',color:'rgba(255,255,255,0.55)',fontFamily:'Sora,sans-serif'}}>/mês</sub>
+        {/* ── PRICING ── */}
+        <section id="precos" style={{
+          position: 'relative', zIndex: 1,
+          background: 'rgba(255,255,255,0.015)',
+          borderTop: '1px solid rgba(255,255,255,0.05)',
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+        }}>
+          <div style={{ maxWidth: 480, margin: '0 auto', padding: '100px 40px', textAlign: 'center' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'IBM Plex Mono', monospace", marginBottom: 14 }}>
+              PREÇO DIRETO
+            </div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 12 }}>
+              Um plano. Acesso total.
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', marginBottom: 48, fontSize: 15 }}>Sem tier básico. Sem funcionalidade travada.</p>
+
+            <div style={{
+              background: '#0d1117',
+              border: '1px solid rgba(59,130,246,0.3)',
+              borderRadius: 20, padding: '40px 36px',
+              boxShadow: '0 0 80px rgba(59,130,246,0.08), inset 0 1px 0 rgba(255,255,255,0.06)',
+            }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'IBM Plex Mono', monospace", marginBottom: 16 }}>
+                KORE SYSTEM
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 4, marginBottom: 6 }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.5)', alignSelf: 'flex-start', marginTop: 10 }}>R$</span>
+                <span style={{ fontSize: 56, fontWeight: 800, letterSpacing: '-0.05em', fontFamily: "'IBM Plex Mono', monospace" }}>29</span>
+                <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)', marginBottom: 6 }}>/mês</span>
+              </div>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 32 }}>Após os 14 dias de trial gratuito</p>
+
+              <div style={{ textAlign: 'left', marginBottom: 32 }}>
+                {[
+                  'Fluxo de caixa em tempo real',
+                  'IA Financeira ilimitada',
+                  'Alertas de DAS automáticos',
+                  'Relatórios anuais + DASN-SIMEI',
+                  'Sincronização bancária (Open Finance)',
+                  'Clientes, orçamentos e cobranças',
+                ].map(f => (
+                  <div key={f} style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '9px 0',
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    fontSize: 14,
+                  }}>
+                    <span style={{ color: '#3B82F6', fontWeight: 700, fontSize: 13 }}>✓</span>
+                    <span style={{ color: 'rgba(255,255,255,0.65)' }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Link href="/login?mode=signup" className="kore-btn-primary" style={{
+                display: 'flex', justifyContent: 'center',
+                width: '100%', padding: 16, fontSize: 16, borderRadius: 12,
+              }}>
+                Começar 14 dias grátis →
+              </Link>
+
+              <p style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>
+                Sem cartão agora · Cancele quando quiser
+              </p>
+            </div>
           </div>
-          <div style={{fontSize:'13px',color:'rgba(255,255,255,0.3)',margin:'8px 0 28px'}}>Cancele quando quiser — sem burocracia</div>
-          <div style={{textAlign:'left',marginBottom:'32px'}}>
-            {[
-              'Cockpit Diário com briefing da IA',
-              'Financeiro automático + fluxo de caixa',
-              'IA Assistente Gemini em linguagem natural',
-              'Contas a receber + Orçamentos profissionais',
-              'Alerta DAS + Limite MEI',
-              'Histórico de DAS + Relatório DASN-SIMEI',
-              'Hub de Integrações (MP, bancos, iFood...)',
-              'Emissão de Nota Fiscal integrada',
-              'Simulador de precificação e pró-labore',
-              'Projeção de crescimento e limite',
-              'Suporte em português 7 dias/semana',
-            ].map(f=>(
-              <div key={f} className="pricing-feat">{f}</div>
+        </section>
+
+        {/* ── CTA FINAL ── */}
+        <section style={{
+          position: 'relative', zIndex: 1,
+          maxWidth: 800, margin: '0 auto',
+          padding: '100px 40px',
+          textAlign: 'center',
+        }}>
+          <div style={{
+            display: 'inline-block',
+            background: 'rgba(59,130,246,0.06)',
+            border: '1px solid rgba(59,130,246,0.15)',
+            borderRadius: 20,
+            padding: '60px 80px',
+          }}>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 16 }}>
+              Você não precisa de mais<br />cursos. Precisa de <span style={{ color: '#3B82F6' }}>dado.</span>
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', marginBottom: 36, fontSize: 16 }}>
+              Comece hoje. Sem cartão. Sem complicação.
+            </p>
+            <Link href="/login?mode=signup" className="kore-btn-primary" style={{ fontSize: 17, padding: '16px 40px', boxShadow: '0 0 48px rgba(59,130,246,0.3)' }}>
+              Começar gratuitamente →
+            </Link>
+          </div>
+        </section>
+
+        {/* ── FOOTER ── */}
+        <footer style={{
+          position: 'relative', zIndex: 1,
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          padding: '28px 40px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          flexWrap: 'wrap', gap: 16,
+          maxWidth: 1200, margin: '0 auto',
+        }}>
+          <KLogo size={22} />
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', fontFamily: "'IBM Plex Mono', monospace" }}>
+            © 2025 Kore System · kore.app
+          </div>
+          <div style={{ display: 'flex', gap: 24 }}>
+            {[['Privacidade', '/privacidade'], ['Termos', '/termos']].map(([label, href]) => (
+              <Link key={label} href={href} style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>
+                {label}
+              </Link>
             ))}
           </div>
-          <button
-            style={{width:'100%',padding:'16px',borderRadius:'14px',fontSize:'16px',fontWeight:800,background:'linear-gradient(135deg,#10b981,#059669)',color:'#fff',border:'none',cursor:'pointer',boxShadow:'0 8px 32px rgba(16,185,129,0.3)',transition:'all .2s'}}
-            onMouseEnter={e=>{(e.target as any).style.transform='translateY(-2px)';(e.target as any).style.boxShadow='0 12px 40px rgba(16,185,129,0.4)'}}
-            onMouseLeave={e=>{(e.target as any).style.transform='';(e.target as any).style.boxShadow='0 8px 32px rgba(16,185,129,0.3)'}}
-            onClick={goCheckout}
-          >
-            Assinar por R$29/mês →
-          </button>
-          <p style={{fontSize:'12px',color:'rgba(255,255,255,0.3)',marginTop:'12px'}}>Cancele quando quiser. Sem burocracia.</p>
-        </div>
+        </footer>
       </div>
-
-      {/* TESTIMONIALS */}
-      <section style={{padding:'0 60px 80px',maxWidth:'1100px',margin:'0 auto',position:'relative',zIndex:1}}>
-        <div style={{fontSize:'11px',color:'#10b981',fontWeight:700,letterSpacing:'3px',textTransform:'uppercase',textAlign:'center',marginBottom:'14px'}}>Depoimentos</div>
-        <h2 style={{fontSize:'clamp(28px,4vw,44px)',fontWeight:800,letterSpacing:'-1px',textAlign:'center',marginBottom:'48px',lineHeight:1.15}}>Quem já usa, não volta<br/>para a planilha</h2>
-        <div className="testimonials-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'20px'}}>
-          {[
-            {text:'"Em 2 semanas já descobri que tava cobrando barato. A IA calculou minha margem real e sugeri aumentar 20%. Fechei o mês com R$1.400 a mais."',name:'Roberto Oliveira',role:'Eletricista MEI · SP',initials:'RO',grad:'linear-gradient(135deg,#10b981,#3b82f6)'},
-            {text:'"Nunca soube se tava tendo lucro de verdade. Agora sei quanto posso retirar todo mês sem prejudicar o negócio. Isso não tem preço."',name:'Maria Costa',role:'Confeiteira MEI · MG',initials:'MC',grad:'linear-gradient(135deg,#8b5cf6,#ec4899)'},
-            {text:'"O alerta do DAS me salvou de 3 multas só no primeiro mês. O sistema me avisa, já com o link pra pagar. Simples assim."',name:'João Santos',role:'Diarista MEI · RJ',initials:'JS',grad:'linear-gradient(135deg,#f59e0b,#ef4444)'},
-          ].map(t=>(
-            <div key={t.name} className="testimonial">
-              <div style={{color:'#f59e0b',fontSize:'14px',marginBottom:'12px'}}>★★★★★</div>
-              <div style={{fontSize:'14px',color:'rgba(255,255,255,0.55)',lineHeight:1.65,marginBottom:'16px'}}>{t.text}</div>
-              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                <div style={{width:'36px',height:'36px',borderRadius:'50%',background:t.grad,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:800,flexShrink:0}}>{t.initials}</div>
-                <div><div style={{fontSize:'13px',fontWeight:700}}>{t.name}</div><div style={{fontSize:'11px',color:'rgba(255,255,255,0.3)'}}>{t.role}</div></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA FINAL */}
-      <section style={{padding:'0 60px 100px',maxWidth:'1100px',margin:'0 auto',textAlign:'center',position:'relative',zIndex:1}}>
-        <h2 style={{fontSize:'clamp(32px,5vw,56px)',fontWeight:900,letterSpacing:'-1.5px',lineHeight:1.1,marginBottom:'16px'}}>Seu negócio merece<br/>um sistema inteligente</h2>
-        <p style={{fontSize:'16px',color:'rgba(255,255,255,0.55)',maxWidth:'520px',margin:'0 auto 36px'}}>Apenas R$29/mês. Cancele quando quiser.</p>
-        <button className="btn-primary btn-hero" onClick={goCheckout}>Assinar agora — R$29/mês →</button>
-        <div style={{display:'flex',alignItems:'center',gap:'20px',justifyContent:'center',marginTop:'20px',fontSize:'13px',color:'rgba(255,255,255,0.3)',flexWrap:'wrap'}}>
-          <span className="hero-proof">R$29/mês</span>
-          <span className="hero-proof">Cancele quando quiser</span>
-          <span className="hero-proof">Suporte em português</span>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="footer" style={{borderTop:'1px solid rgba(255,255,255,0.07)',padding:'40px 60px',display:'flex',justifyContent:'space-between',alignItems:'center',position:'relative',zIndex:1}}>
-        <div style={{fontSize:'16px',fontWeight:800}}>MEI <span style={{color:'#10b981'}}>360</span> OS</div>
-        <div style={{fontSize:'13px',color:'rgba(255,255,255,0.3)'}}>© 2026 MEI 360 OS. Todos os direitos reservados.</div>
-        <div style={{fontSize:'13px',color:'rgba(255,255,255,0.3)'}}>Feito 🇧🇷 para o MEI brasileiro</div>
-      </footer>
-    </div>
+    </>
   )
 }

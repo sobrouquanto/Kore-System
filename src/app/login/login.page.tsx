@@ -4,7 +4,7 @@ import { useState, Suspense } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-// ── Botão voltar reutilizável ─────────────────────────────────────────────────
+// ── Botão voltar ──────────────────────────────────────────────
 function BackButton({ href, label = 'Voltar' }: { href: string; label?: string }) {
   const router = useRouter()
   return (
@@ -34,13 +34,27 @@ function BackButton({ href, label = 'Voltar' }: { href: string; label?: string }
   )
 }
 
-function LoginForm() {
-  const router       = useRouter()
-  const searchParams = useSearchParams()
+// ── Logo Kore ─────────────────────────────────────────────────
+function KoreLogo() {
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+        <path d="M8 5 L8 27"   stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
+        <path d="M8 16 L24 5"  stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
+        <path d="M8 16 L24 27" stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
+      </svg>
+      <div style={{ fontSize: '22px', fontWeight: 900, color: '#f1f5f9', letterSpacing: '-0.5px' }}>
+        Kore <span style={{ color: 'rgba(255,255,255,0.35)', fontWeight: 400, fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>System</span>
+      </div>
+    </div>
+  )
+}
 
-  // Se veio de ?next=assinar → abre direto na aba "Criar conta"
-  const nextParam      = searchParams.get('next')
-  const initialMode    = nextParam === 'assinar' ? 'signup' : 'login'
+function LoginForm() {
+  const searchParams  = useSearchParams()
+  // Suporta ?mode=signup (vindo da landing) e ?redirectedFrom / ?next
+  const initialMode   = searchParams.get('mode') === 'signup' ? 'signup' : 'login'
+  const redirectedFrom = searchParams.get('redirectedFrom') || searchParams.get('next') || null
 
   const [mode, setMode]         = useState<'login' | 'signup'>(initialMode)
   const [email, setEmail]       = useState('')
@@ -50,6 +64,8 @@ function LoginForm() {
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState('')
   const [success, setSuccess]   = useState('')
+
+  const router = useRouter()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -71,8 +87,9 @@ function LoginForm() {
         router.refresh()
         await new Promise(r => setTimeout(r, 50))
 
-        // Lógica limpa — ignora redirectedFrom se o usuário já tem tudo ok
-        if (profile?.plano_ativo && profile?.onboarding_done) {
+        if (redirectedFrom && profile?.plano_ativo && profile?.onboarding_done) {
+          router.push(redirectedFrom)
+        } else if (profile?.plano_ativo && profile?.onboarding_done) {
           router.push('/app')
         } else if (!profile?.plano_ativo) {
           router.push('/assinar')
@@ -101,9 +118,9 @@ function LoginForm() {
         }
       }
     } catch (err: any) {
-      if (err.message.includes('Invalid login'))        setError('E-mail ou senha incorretos.')
+      if (err.message.includes('Invalid login'))          setError('E-mail ou senha incorretos.')
       else if (err.message.includes('already registered')) setError('Este e-mail já possui cadastro.')
-      else if (err.message.includes('Password'))        setError('A senha precisa ter no mínimo 6 caracteres.')
+      else if (err.message.includes('Password'))          setError('A senha precisa ter no mínimo 6 caracteres.')
       else setError(err.message)
     } finally {
       setLoading(false)
@@ -112,33 +129,27 @@ function LoginForm() {
 
   return (
     <div style={{
-      minHeight: '100vh', background: '#060a12',
+      minHeight: '100vh', background: '#0B0B0F',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: "'Sora', sans-serif", padding: '20px',
+      fontFamily: "'Inter', sans-serif", padding: '20px',
     }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&display=swap');`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');`}</style>
 
-      {/* Botão de voltar — só mostra se não for a página raiz do fluxo */}
       <BackButton href="/" label="Página inicial" />
 
       {/* Orbs de fundo */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', width: '600px', height: '600px', top: '-200px', left: '10%', background: 'radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%)', borderRadius: '50%' }} />
-        <div style={{ position: 'absolute', width: '400px', height: '400px', bottom: '-100px', right: '5%', background: 'radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%)', borderRadius: '50%' }} />
+        <div style={{ position: 'absolute', width: '600px', height: '600px', top: '-200px', left: '10%', background: 'radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%)', borderRadius: '50%' }} />
+        <div style={{ position: 'absolute', width: '400px', height: '400px', bottom: '-100px', right: '5%', background: 'radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 70%)', borderRadius: '50%' }} />
       </div>
 
       <div style={{ width: '100%', maxWidth: '420px', position: 'relative', zIndex: 1 }}>
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <div style={{ width: '38px', height: '38px', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '16px', color: '#10b981' }}>M</div>
-            <div style={{ fontSize: '22px', fontWeight: 900, color: '#f1f5f9', letterSpacing: '-0.5px' }}>
-              MEI <span style={{ color: '#10b981' }}>360</span> OS
-            </div>
-          </div>
-          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.35)' }}>
-            O sistema operacional do seu negócio
+          <KoreLogo />
+          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.35)', marginTop: '4px' }}>
+            O núcleo financeiro do seu negócio
           </div>
         </div>
 
@@ -157,7 +168,7 @@ function LoginForm() {
                 onClick={() => { setMode(m); setError(''); setSuccess('') }}
                 style={{
                   flex: 1, padding: '8px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                  background: mode === m ? '#10b981' : 'transparent',
+                  background: mode === m ? '#3B82F6' : 'transparent',
                   color: mode === m ? '#fff' : 'rgba(255,255,255,0.5)',
                   fontWeight: 700, fontSize: '14px', transition: 'all .2s', fontFamily: 'inherit',
                 }}
@@ -191,12 +202,12 @@ function LoginForm() {
 
             {error && (
               <div style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '12px', fontSize: '13px', color: '#fca5a5' }}>
-                ❌ {error}
+                ✗ {error}
               </div>
             )}
             {success && (
-              <div style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '10px', padding: '12px', fontSize: '13px', color: '#6ee7b7' }}>
-                ✅ {success}
+              <div style={{ background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '10px', padding: '12px', fontSize: '13px', color: '#93c5fd' }}>
+                ✓ {success}
               </div>
             )}
 
@@ -204,13 +215,14 @@ function LoginForm() {
               type="submit"
               disabled={loading}
               style={{
-                background: 'linear-gradient(135deg,#10b981,#059669)',
+                background: loading ? 'rgba(59,130,246,0.5)' : '#3B82F6',
                 color: '#fff', border: 'none', padding: '14px',
                 borderRadius: '12px', fontSize: '15px', fontWeight: 800,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.7 : 1,
-                marginTop: '4px', boxShadow: '0 4px 20px rgba(16,185,129,0.3)',
+                marginTop: '4px',
+                boxShadow: loading ? 'none' : '0 4px 20px rgba(59,130,246,0.3)',
                 fontFamily: 'inherit',
+                transition: 'all .2s',
               }}
             >
               {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar no sistema' : 'Criar conta grátis'}
@@ -220,7 +232,7 @@ function LoginForm() {
 
         {mode === 'signup' && (
           <p style={{ textAlign: 'center', fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginTop: '16px' }}>
-            ✓ 7 dias grátis &nbsp;·&nbsp; ✓ Sem compromisso &nbsp;·&nbsp; ✓ Cancele quando quiser
+            ✓ 14 dias grátis &nbsp;·&nbsp; ✓ Sem compromisso &nbsp;·&nbsp; ✓ Cancele quando quiser
           </p>
         )}
 
@@ -229,7 +241,7 @@ function LoginForm() {
             Ainda não tem conta?{' '}
             <button
               onClick={() => setMode('signup')}
-              style={{ background: 'none', border: 'none', color: '#10b981', cursor: 'pointer', fontSize: '12px', fontWeight: 700, fontFamily: 'inherit' }}
+              style={{ background: 'none', border: 'none', color: '#3B82F6', cursor: 'pointer', fontSize: '12px', fontWeight: 700, fontFamily: 'inherit' }}
             >
               Criar grátis
             </button>
@@ -242,7 +254,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#060a12' }} />}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#0B0B0F' }} />}>
       <LoginForm />
     </Suspense>
   )

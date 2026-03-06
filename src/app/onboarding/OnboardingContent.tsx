@@ -101,7 +101,7 @@ export default function OnboardingContent() {
           {[0, 1, 2].map(i => (
             <div key={i} style={{
               width: '8px', height: '8px', borderRadius: '50%',
-              background: '#10b981',
+              background: '#2E62FF',
               animation: `pulse 1.2s ${i * 0.2}s ease-in-out infinite`,
             }} />
           ))}
@@ -160,9 +160,9 @@ function OnboardingFlow() {
     <div style={{
       minHeight: '100vh', background: '#060a12',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: "'Sora', sans-serif", color: '#f1f5f9', padding: '20px',
+      fontFamily: "'Inter', sans-serif", color: '#f1f5f9', padding: '20px',
     }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800;900&display=swap');*{margin:0;padding:0;box-sizing:border-box;}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap');*{margin:0;padding:0;box-sizing:border-box;}`}</style>
 
       {/* Botão voltar — volta para step anterior ou para /assinar no step 0 */}
       <BackButton
@@ -172,15 +172,17 @@ function OnboardingFlow() {
 
       {/* Orb */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', width: '500px', height: '500px', top: '-150px', left: '20%', background: 'radial-gradient(circle, rgba(16,185,129,0.055) 0%, transparent 70%)', borderRadius: '50%' }} />
+        <div style={{ position: 'absolute', width: '500px', height: '500px', top: '-150px', left: '20%', background: 'radial-gradient(circle, rgba(46,98,255,0.055) 0%, transparent 70%)', borderRadius: '50%' }} />
       </div>
 
       <div style={{ maxWidth: '480px', width: '100%', position: 'relative', zIndex: 1 }}>
 
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '40px' }}>
-          <div style={{ width: '32px', height: '32px', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '14px', color: '#10b981' }}>M</div>
-          <div style={{ fontSize: '16px', fontWeight: 800, letterSpacing: '-0.3px' }}>MEI <span style={{ color: '#10b981' }}>360</span> OS</div>
+          <div style={{ width: '32px', height: '32px', background: 'rgba(46,98,255,0.15)', border: '1px solid rgba(46,98,255,0.25)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="16" height="16" viewBox="0 0 28 28" fill="none"><path d="M7 6L7 22M7 14L16 6M7 14L16 22" stroke="#2E62FF" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>
+          <div style={{ fontSize: '16px', fontWeight: 800, letterSpacing: '-0.3px' }}>Kore</div>
         </div>
 
         {/* Barra de progresso */}
@@ -188,7 +190,7 @@ function OnboardingFlow() {
           {steps.map((_, i) => (
             <div key={i} style={{
               flex: 1, height: '4px', borderRadius: '99px',
-              background: i <= step ? '#10b981' : 'rgba(255,255,255,0.1)',
+              background: i <= step ? '#2E62FF' : 'rgba(255,255,255,0.1)',
               transition: 'background .3s',
             }} />
           ))}
@@ -214,7 +216,7 @@ function OnboardingFlow() {
             border: '1px solid rgba(255,255,255,0.12)',
             borderRadius: '14px', padding: '16px 18px',
             color: '#f1f5f9', fontSize: '16px', outline: 'none',
-            marginBottom: '16px', fontFamily: 'Sora, sans-serif',
+            marginBottom: '16px', fontFamily: 'Inter, system-ui, sans-serif',
             boxSizing: 'border-box',
           }}
         />
@@ -225,11 +227,11 @@ function OnboardingFlow() {
           style={{
             width: '100%', padding: '15px', borderRadius: '14px',
             fontSize: '15px', fontWeight: 800,
-            background: canAdvance ? 'linear-gradient(135deg,#10b981,#059669)' : 'rgba(255,255,255,0.08)',
+            background: canAdvance ? 'linear-gradient(135deg,#2E62FF,#1E4FE8)' : 'rgba(255,255,255,0.08)',
             color: canAdvance ? '#fff' : 'rgba(255,255,255,0.3)',
             border: 'none', cursor: canAdvance ? 'pointer' : 'not-allowed',
             transition: 'all .2s',
-            boxShadow: canAdvance ? '0 4px 20px rgba(16,185,129,0.3)' : 'none',
+            boxShadow: canAdvance ? '0 4px 20px rgba(46,98,255,0.3)' : 'none',
             fontFamily: 'inherit',
           }}
         >
@@ -255,13 +257,13 @@ const containerStyle: React.CSSProperties = {
   minHeight: '100vh', background: '#060a12',
   display: 'flex', flexDirection: 'column',
   alignItems: 'center', justifyContent: 'center',
-  fontFamily: "'Sora', sans-serif",
+  fontFamily: "'Inter', sans-serif",
 }
 
 const spinnerStyle: React.CSSProperties = {
   width: '32px', height: '32px',
   border: '3px solid rgba(255,255,255,0.1)',
-  borderTop: '3px solid #10b981',
+  borderTop: '3px solid #2E62FF',
   borderRadius: '50%',
   animation: 'spin 0.8s linear infinite',
   marginBottom: '16px',

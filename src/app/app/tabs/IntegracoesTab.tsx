@@ -319,26 +319,23 @@ export default function IntegracoesTab() {
         </div>
       )}
 
-      {/* Header — idêntico ao original */}
-      <div className="card" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+      {/* Header */}
+      <div className="card" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
         <div style={{ fontSize: '32px' }}>🔗</div>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: '160px' }}>
           <div style={{ fontSize: '16px', fontWeight: 800 }}>Hub de Integrações</div>
           <div style={{ fontSize: '13px', color: 'var(--text2)', marginTop: '2px' }}>Conecte suas ferramentas e deixe o Kore trabalhar por você.</div>
         </div>
-        <div style={{ display: 'flex', gap: '20px', flexShrink: 0 }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '24px', fontWeight: 900, fontFamily: 'var(--mono)', color: totalConectados > 0 ? 'var(--green)' : 'var(--text2)' }}>{totalConectados}</div>
-            <div style={{ fontSize: '11px', color: 'var(--text3)' }}>Conectadas</div>
-          </div>
+        <div style={{ textAlign: 'center', flexShrink: 0 }}>
+          <div style={{ fontSize: '24px', fontWeight: 900, fontFamily: 'var(--mono)', color: totalConectados > 0 ? 'var(--green)' : 'var(--text2)' }}>{totalConectados}</div>
+          <div style={{ fontSize: '11px', color: 'var(--text3)' }}>Conectadas</div>
         </div>
       </div>
 
-      {/* ── Bancos — seção expandida com Sprint 2 ────────────────────────────── */}
       <div className="card" style={{ marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: bancosConectados > 0 ? '16px' : '0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>🏦</div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: bancosConectados > 0 ? '16px' : '0', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: '200px' }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', flexShrink: 0 }}>🏦</div>
             <div>
               <div style={{ fontSize: '15px', fontWeight: 700 }}>Conta Bancária</div>
               <div style={{ fontSize: '12px', color: 'var(--text3)', marginTop: '4px' }}>
@@ -348,23 +345,13 @@ export default function IntegracoesTab() {
               </div>
             </div>
           </div>
-          {/* Sprint 2: botão "Sincronizar tudo" quando há bancos conectados */}
-          <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: '8px', flexShrink: 0, flexWrap: 'wrap' }}>
             {bancosConectados > 0 && (
-              <button
-                className="btn-ghost-sm"
-                disabled={syncingAll}
-                onClick={syncTodosBancos}
-                style={{ fontSize: '12px', opacity: syncingAll ? 0.5 : 1 }}
-              >
+              <button className="btn-ghost-sm" disabled={syncingAll} onClick={syncTodosBancos} style={{ fontSize: '12px', opacity: syncingAll ? 0.5 : 1 }}>
                 {syncingAll ? '⟳ Sincronizando...' : '⟳ Sincronizar tudo'}
               </button>
             )}
-            <button
-              className="btn-add"
-              style={{ padding: '8px 18px', fontSize: '13px' }}
-              onClick={() => { setIntgModal('banco'); setIntgStep(1); setIntgBanco('') }}
-            >
+            <button className="btn-add" style={{ padding: '8px 18px', fontSize: '13px' }} onClick={() => { setIntgModal('banco'); setIntgStep(1); setIntgBanco('') }}>
               {bancosConectados > 0 ? '+ Adicionar banco' : 'Conectar banco →'}
             </button>
           </div>
@@ -454,8 +441,8 @@ export default function IntegracoesTab() {
         )}
       </div>
 
-      {/* MP + NF — idêntico ao original */}
-      <div className="grid-2">
+      {/* MP + NF */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
         {[
           {
             key: 'mercadopago', icon: '💳', name: 'Mercado Pago', desc: 'Vendas e Pix automáticos',
@@ -495,7 +482,7 @@ export default function IntegracoesTab() {
       {/* Em breve — idêntico ao original */}
       <div style={{ marginTop: '16px' }}>
         <div style={{ fontSize: '11px', color: 'var(--text3)', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '10px' }}>Em breve</div>
-        <div className="grid-2">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
           {[
             { icon: '🛵', name: 'iFood',             desc: 'Pedidos e faturamento automático' },
             { icon: '🛍️', name: 'Shopee',            desc: 'Vendas marketplace' },

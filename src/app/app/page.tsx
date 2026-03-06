@@ -1,19 +1,20 @@
 'use client'
+
 import { useState, useEffect, Suspense, lazy } from 'react'
 import { DashboardProvider, useDashboard } from '@/context/DashboardContext'
 import DashboardLayout, { TabId } from '@/app/app/DashboardLayout'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 // ── Lazy-loaded tabs ──────────────────────────────────────────────────────────
-const CockpitTab      = lazy(() => import('@/app/app/tabs/CockpitTab'))
-const FinanceiroTab   = lazy(() => import('@/app/app/tabs/FinanceiroTab'))
-const LancamentosTab  = lazy(() => import('@/app/app/tabs/LancamentosTab'))
-const ClientesTab     = lazy(() => import('@/app/app/tabs/ClientesTab'))
-const OrcamentosTab   = lazy(() => import('@/app/app/tabs/OrcamentosTab'))
-const IATab           = lazy(() => import('@/app/app/tabs/IATab'))
-const RelatoriosTab   = lazy(() => import('@/app/app/tabs/RelatoriosTab'))
-const SimuladoresTab  = lazy(() => import('@/app/app/tabs/SimuladoresTab'))
-const IntegracoesTab  = lazy(() => import('@/app/app/tabs/IntegracoesTab'))
+const CockpitTab       = lazy(() => import('@/app/app/tabs/CockpitTab'))
+const FinanceiroTab    = lazy(() => import('@/app/app/tabs/FinanceiroTab'))
+const LancamentosTab   = lazy(() => import('@/app/app/tabs/LancamentosTab'))
+const ClientesTab      = lazy(() => import('@/app/app/tabs/ClientesTab'))
+const OrcamentosTab    = lazy(() => import('@/app/app/tabs/OrcamentosTab'))
+const IATab            = lazy(() => import('@/app/app/tabs/IATab'))
+const RelatoriosTab    = lazy(() => import('@/app/app/tabs/RelatoriosTab'))
+const SimuladoresTab   = lazy(() => import('@/app/app/tabs/SimuladoresTab'))
+const IntegracoesTab   = lazy(() => import('@/app/app/tabs/IntegracoesTab'))
 const ConfiguracoesTab = lazy(() => import('@/app/app/tabs/ConfiguracoesTab'))
 
 // ── Loading skeleton ──────────────────────────────────────────────────────────
@@ -46,27 +47,24 @@ function Dashboard() {
     )
   }
 
-  // Provide setActiveTab to child tabs via context augmentation
-  const ctx = { setActiveTab }
-
   function renderTab() {
     switch (activeTab) {
-      case 'cockpit':        return <CockpitTab />
-      case 'financeiro':     return <FinanceiroTab />
-      case 'lancamentos':    return <LancamentosTab />
-      case 'clientes':       return <ClientesTab />
-      case 'orcamentos':     return <OrcamentosTab />
-      case 'ia':             return <IATab />
-      case 'relatorios':     return <RelatoriosTab />
-      case 'simuladores':    return <SimuladoresTab />
-      case 'integracoes':    return <IntegracoesTab />
-      case 'configuracoes':  return <ConfiguracoesTab />
-      case 'integracoes': return (
-  <ErrorBoundary>
-    <IntegracoesTab />
-  </ErrorBoundary>
-)
-      default:               return <CockpitTab />
+      case 'cockpit':       return <CockpitTab />
+      case 'financeiro':    return <FinanceiroTab />
+      case 'lancamentos':   return <LancamentosTab />
+      case 'clientes':      return <ClientesTab />
+      case 'orcamentos':    return <OrcamentosTab />
+      case 'ia':            return <IATab />
+      case 'relatorios':    return <RelatoriosTab />
+      case 'simuladores':   return <SimuladoresTab />
+      // Sprint 3: bug fix — case duplicado removido; ErrorBoundary mantido
+      case 'integracoes':   return (
+        <ErrorBoundary>
+          <IntegracoesTab />
+        </ErrorBoundary>
+      )
+      case 'configuracoes': return <ConfiguracoesTab />
+      default:              return <CockpitTab />
     }
   }
 

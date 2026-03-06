@@ -32,7 +32,7 @@ export default function DashboardLayout({
   setActiveTab: (tab: TabId) => void
   children: React.ReactNode
 }) {
-  const { userName, userBiz, stats, trialDaysLeft, trialExpired, confirmModal, setConfirmModal, doLogout } = useDashboard()
+  const { userName, userBiz, stats, trialDaysLeft, trialExpired, planActive, confirmModal, setConfirmModal, doLogout } = useDashboard()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const trialBannerColor = trialDaysLeft <= 1 ? 'var(--red)' : trialDaysLeft <= 3 ? 'var(--amber)' : 'var(--blue)'
@@ -76,7 +76,7 @@ export default function DashboardLayout({
               Assinar agora →
             </button>
           </div>
-        ) : trialDaysLeft <= 7 && (
+        ) : !planActive && trialDaysLeft <= 7 && (
           <div className="sidebar-trial" style={{ borderColor: `rgba(${trialDaysLeft <= 1 ? '239,68,68' : trialDaysLeft <= 3 ? '245,158,11' : '59,130,246'},0.3)` }}>
             <div style={{ fontSize: '12px', fontWeight: 700, color: trialBannerColor, marginBottom: '4px' }}>
               {trialDaysLeft === 0 ? '🚨 Último dia' : `⏳ ${trialDaysLeft} dia${trialDaysLeft > 1 ? 's' : ''} restante${trialDaysLeft > 1 ? 's' : ''}`}

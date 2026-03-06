@@ -50,15 +50,18 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  const { pathname } = request.nextUrl
+
+  // ── Rotas públicas — passa direto sem verificar sessão ───────────────────
+  const publicPaths = ['/login', '/assinar', '/onboarding', '/api/', '/_next/']
+  if (publicPaths.some(p => pathname.startsWith(p))) {
+    return supabaseResponse
+  }
+
   // ── 2. Refresh da sessão ──────────────────────────────────────────────────
-  // getUser() valida o JWT com o servidor Supabase e, se necessário,
-  // emite um novo access_token — o setAll acima cuida de gravá-lo nos cookies.
-  // NÃO use getSession() aqui: ele só lê o cookie local e não detecta revogação.
   const {
     data: { user },
   } = await supabase.auth.getUser()
-
-  const { pathname } = request.nextUrl
 
   // ── 3. Proteção de /app/* ────────────────────────────────────────────────
   if (pathname.startsWith('/app')) {
@@ -94,13 +97,6 @@ export async function middleware(request: NextRequest) {
       dest.pathname = '/onboarding'
       return copyAndRedirect(supabaseResponse, dest.toString())
     }
-  }
-
-  // ── 4. Redireciona usuário já logado que acessa /login ───────────────────
-  if (pathname === '/login' && user) {
-    const dest = request.nextUrl.clone()
-    dest.pathname = '/app'
-    return copyAndRedirect(supabaseResponse, dest.toString())
   }
 
   // ── 5. Retorna sempre supabaseResponse (nunca um NextResponse avulso) ────

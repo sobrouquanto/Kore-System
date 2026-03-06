@@ -13,6 +13,12 @@ export type Transaction = {
   category: string
   date: string
   created_at: string
+  // Sprint 2/3 — opcionais para não quebrar transações antigas (sem migration)
+  source?: 'manual' | 'bank_sync'
+  external_id?: string
+  is_personal?: boolean
+  bank_account_name?: string
+  bank_name?: string
 }
 
 export type Client = {
@@ -63,6 +69,11 @@ export type Stats = {
   monthProfit: number
   yearRevenue: number
   healthScore: number
+  // Sprint 3: métricas separando negócio x pessoal
+  monthRevenueNet: number    // receita excluindo gastos pessoais
+  monthExpensesNet: number   // despesas só do negócio (is_personal = false)
+  monthProfitNet: number     // lucro real do negócio
+  bankSyncCount: number      // total de transações importadas do banco este mês
 }
 
 export type ChartMonth = {
@@ -105,7 +116,7 @@ export function todayISO() {
 export function monthRange() {
   const now = new Date()
   const first = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-  const last = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+  const last  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
   return { first, last }
 }
 
@@ -117,20 +128,15 @@ export function getInitials(name: string) {
   return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
 }
 
-// ─── Context ─────────────────────────────────────────────────────────────────
+// ─── Context type ─────────────────────────────────────────────────────────────
 
 type DashboardContextType = {
-  // User
   user: any
   userName: string
   userBiz: string
   setUserName: (v: string) => void
   setUserBiz: (v: string) => void
-
-  // Loading
   loading: boolean
-
-  // Data
   transactions: Transaction[]
   clients: Client[]
   receivables: Receivable[]
@@ -139,30 +145,20 @@ type DashboardContextType = {
   stats: Stats
   chartData: ChartMonth[]
   integrations: Record<string, Integration>
-
-  // Plan
   trialDaysLeft: number
   trialExpired: boolean
   planActive: boolean
   setPlanActive: (v: boolean) => void
-
-  // AI
   aiMessages: AiMessage[]
   setAiMessages: (msgs: AiMessage[] | ((prev: AiMessage[]) => AiMessage[])) => void
   aiTyping: boolean
   setAiTyping: (v: boolean) => void
   chatRef: React.RefObject<HTMLDivElement | null>
-
-  // Navigation (set from page.tsx via setActiveTabRef)
   setActiveTab: (tab: string) => void
   registerActiveTabSetter: (fn: (tab: string) => void) => void
-
-  // Confirm modal
   confirmModal: { msg: string; onOk: () => void } | null
   showConfirm: (msg: string, onOk: () => void) => void
   setConfirmModal: (v: { msg: string; onOk: () => void } | null) => void
-
-  // Actions
   loadAll: (u: any) => Promise<void>
   loadIntegrations: (userId: string) => Promise<void>
   saveIntegration: (provider: string, providerName: string, token: string, meta?: any) => Promise<boolean>
@@ -195,40 +191,41 @@ export function useDashboard() {
 export function DashboardProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
 
-  // Navigation callback — injected by page.tsx so tabs can switch tabs
   const activeTabRef = useRef<(tab: string) => void>(() => {})
   const setActiveTab = (tab: string) => activeTabRef.current(tab)
   const registerActiveTabSetter = (fn: (tab: string) => void) => { activeTabRef.current = fn }
 
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser]         = useState<any>(null)
   const [userName, setUserName] = useState('')
-  const [userBiz, setUserBiz] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [userBiz, setUserBiz]   = useState('')
+  const [loading, setLoading]   = useState(true)
 
   const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [clients, setClients] = useState<Client[]>([])
-  const [receivables, setReceivables] = useState<Receivable[]>([])
-  const [dasHistory, setDasHistory] = useState<DasHistory[]>([])
-  const [quotes, setQuotes] = useState<Quote[]>([])
-  const [stats, setStats] = useState<Stats>({ monthRevenue: 0, monthExpenses: 0, monthProfit: 0, yearRevenue: 0, healthScore: 0 })
-  const [chartData, setChartData] = useState<ChartMonth[]>([])
+  const [clients, setClients]           = useState<Client[]>([])
+  const [receivables, setReceivables]   = useState<Receivable[]>([])
+  const [dasHistory, setDasHistory]     = useState<DasHistory[]>([])
+  const [quotes, setQuotes]             = useState<Quote[]>([])
+
+  const [stats, setStats] = useState<Stats>({
+    monthRevenue: 0, monthExpenses: 0, monthProfit: 0,
+    yearRevenue: 0, healthScore: 0,
+    monthRevenueNet: 0, monthExpensesNet: 0, monthProfitNet: 0,
+    bankSyncCount: 0,
+  })
+  const [chartData, setChartData]       = useState<ChartMonth[]>([])
   const [integrations, setIntegrations] = useState<Record<string, Integration>>({})
 
   const [trialDaysLeft, setTrialDaysLeft] = useState(7)
-  const [trialExpired, setTrialExpired] = useState(false)
-  const [planActive, setPlanActive] = useState(false)
+  const [trialExpired, setTrialExpired]   = useState(false)
+  const [planActive, setPlanActive]       = useState(false)
 
   const [aiMessages, setAiMessages] = useState<AiMessage[]>([])
-  const [aiTyping, setAiTyping] = useState(false)
+  const [aiTyping, setAiTyping]     = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
 
   const [confirmModal, setConfirmModal] = useState<{ msg: string; onOk: () => void } | null>(null)
+  function showConfirm(msg: string, onOk: () => void) { setConfirmModal({ msg, onOk }) }
 
-  function showConfirm(msg: string, onOk: () => void) {
-    setConfirmModal({ msg, onOk })
-  }
-
-  // Session check on mount
   useEffect(() => {
     async function checkSession() {
       const { data: { user }, error } = await supabase.auth.getUser()
@@ -240,25 +237,28 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         .eq('id', user.id)
         .single()
 
-      if (!profile?.plano_ativo) { router.push('/assinar'); return }
+      if (!profile?.plano_ativo) {
+  if (typeof window !== 'undefined' && !window.location.pathname.includes('/assinar')) {
+    router.push('/assinar')
+  }
+  return
+}
       if (!profile?.onboarding_done) { router.push('/onboarding'); return }
 
       checkTrial(user, profile)
       await loadAll(user)
     }
     checkSession()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function checkTrial(u: any, profile?: any) {
     if (profile?.plano === 'completo' || (profile?.plano_ativo && profile?.plano !== 'trial')) {
-      setPlanActive(true)
-      setTrialExpired(false)
-      return
+      setPlanActive(true); setTrialExpired(false); setTrialDaysLeft(99); return
     }
     const createdAt = new Date(u.created_at || Date.now())
-    const diffDays = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
-    const daysLeft = Math.max(0, 7 - diffDays)
+    const diffDays  = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
+    const daysLeft  = Math.max(0, 7 - diffDays)
     setTrialDaysLeft(daysLeft)
     if (daysLeft <= 0) setTrialExpired(true)
   }
@@ -266,7 +266,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const loadAll = useCallback(async (u: any) => {
     setUser(u)
     const name = u.user_metadata?.name || u.email?.split('@')[0] || 'Usuário'
-    const biz = u.user_metadata?.business_name || 'Meu Negócio'
+    const biz  = u.user_metadata?.business_name || 'Meu Negócio'
     setUserName(name)
     setUserBiz(biz)
     setAiMessages([{
@@ -291,19 +291,39 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     ])
 
     const txs: Transaction[] = resTxMonth.data || []
-    const monthRevenue = txs.filter(t => t.type === 'in').reduce((s, t) => s + t.value, 0)
+
+    // ── Cálculos totais (todas as transações, inclui pessoal) — para compatibilidade
+    const monthRevenue  = txs.filter(t => t.type === 'in').reduce((s, t) => s + t.value, 0)
     const monthExpenses = txs.filter(t => t.type === 'out').reduce((s, t) => s + t.value, 0)
-    const monthProfit = monthRevenue - monthExpenses
+    const monthProfit   = monthRevenue - monthExpenses
+
+    // ── Sprint 3: cálculos do NEGÓCIO separando gastos pessoais
+    // is_personal pode ser undefined em transações antigas → trata como false
+    const bizTxs           = txs.filter(t => !t.is_personal)
+    const monthRevenueNet  = bizTxs.filter(t => t.type === 'in').reduce((s, t) => s + t.value, 0)
+    const monthExpensesNet = bizTxs.filter(t => t.type === 'out').reduce((s, t) => s + t.value, 0)
+    const monthProfitNet   = monthRevenueNet - monthExpensesNet
+
+    // ── Sprint 3: contador de transações importadas do banco este mês
+    const bankSyncCount = txs.filter(t => t.source === 'bank_sync').length
+
     const yearRevenue = (resTxYear.data || []).reduce((s: number, t: any) => s + t.value, 0)
+
+    // Health score usa lucro líquido do negócio
     const healthScore = Math.min(100, Math.max(0,
-      Math.round((monthProfit / (monthRevenue || 1)) * 60 + ((81000 - yearRevenue) / 81000) * 40)
+      Math.round((monthProfitNet / (monthRevenueNet || 1)) * 60 + ((81000 - yearRevenue) / 81000) * 40)
     ))
 
     setTransactions(txs)
     setClients(resCli.data || [])
-    setStats({ monthRevenue, monthExpenses, monthProfit, yearRevenue, healthScore })
+    setStats({
+      monthRevenue, monthExpenses, monthProfit,
+      yearRevenue, healthScore,
+      monthRevenueNet, monthExpensesNet, monthProfitNet,
+      bankSyncCount,
+    })
 
-    // Chart 6 months
+    // Chart 6 meses (sem alteração)
     const allTxs = resChart.data || []
     const months: ChartMonth[] = Array.from({ length: 6 }, (_, i) => {
       const d = new Date(); d.setMonth(d.getMonth() - (5 - i))
@@ -342,12 +362,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
   async function saveIntegration(provider: string, providerName: string, token: string, meta: any = {}) {
     const { error } = await supabase.from('integrations').upsert({
-      user_id: user.id,
-      provider,
-      provider_name: providerName,
-      status: 'connected',
-      access_token: token,
-      metadata: meta,
+      user_id: user.id, provider, provider_name: providerName,
+      status: 'connected', access_token: token, metadata: meta,
       connected_at: new Date().toISOString(),
     }, { onConflict: 'user_id,provider,provider_name' })
     if (!error) await loadIntegrations(user.id)
@@ -422,8 +438,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
   async function saveConfig(name: string, biz: string) {
     await supabase.auth.updateUser({ data: { name, business_name: biz } })
-    setUserName(name)
-    setUserBiz(biz)
+    setUserName(name); setUserBiz(biz)
   }
 
   async function doLogout() {

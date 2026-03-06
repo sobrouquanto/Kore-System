@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/pluggy/sync-all",
+      "schedule": "0 */6 * * *"
+    }
+  ]
+}

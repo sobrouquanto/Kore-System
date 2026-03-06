@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense, lazy } from 'react'
 import { DashboardProvider, useDashboard } from '@/context/DashboardContext'
 import DashboardLayout, { TabId } from '@/app/app/DashboardLayout'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 // ── Lazy-loaded tabs ──────────────────────────────────────────────────────────
 const CockpitTab      = lazy(() => import('@/app/app/tabs/CockpitTab'))
@@ -60,6 +61,11 @@ function Dashboard() {
       case 'simuladores':    return <SimuladoresTab />
       case 'integracoes':    return <IntegracoesTab />
       case 'configuracoes':  return <ConfiguracoesTab />
+      case 'integracoes': return (
+  <ErrorBoundary>
+    <IntegracoesTab />
+  </ErrorBoundary>
+)
       default:               return <CockpitTab />
     }
   }

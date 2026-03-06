@@ -10,6 +10,8 @@ export default function LancamentosTab() {
   const [txDesc, setTxDesc] = useState('')
   const [txVal, setTxVal] = useState('')
   const [txCat, setTxCat] = useState('Serviço')
+  const [catDropOpen, setCatDropOpen] = useState(false)
+  const CATS = ['Serviço', 'Produto', 'Fornecedor', 'Imposto', 'Fixo', 'Equipamento', 'Pessoal']
   const [txDate, setTxDate] = useState(todayISO())
   const [txLoading, setTxLoading] = useState(false)
 
@@ -54,10 +56,28 @@ export default function LancamentosTab() {
           <div className="form-row">
             <div className="form-group-sm">
               <label>Categoria</label>
-              <select value={txCat} onChange={e => setTxCat(e.target.value)}>
-                <option>Serviço</option><option>Produto</option><option>Fornecedor</option>
-                <option>Imposto</option><option>Fixo</option><option>Equipamento</option><option>Pessoal</option>
-              </select>
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setCatDropOpen(o => !o)}
+                  style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--card-border)', borderRadius: '9px', padding: '9px 32px 9px 12px', color: 'var(--text)', fontSize: '13px', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', position: 'relative' }}
+                >
+                  {txCat}
+                  <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)', fontSize: '10px' }}>▼</span>
+                </button>
+                {catDropOpen && (
+                  <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, background: '#111827', border: '1px solid var(--card-border)', borderRadius: '10px', overflow: 'hidden', zIndex: 200, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
+                    {CATS.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => { setTxCat(cat); setCatDropOpen(false) }}
+                        style={{ display: 'block', width: '100%', padding: '9px 14px', background: cat === txCat ? 'var(--green-dim)' : 'transparent', border: 'none', color: cat === txCat ? 'var(--green)' : 'var(--text2)', fontSize: '13px', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="form-group-sm"><label>Data</label><input type="date" value={txDate} onChange={e => setTxDate(e.target.value)} /></div>
           </div>
@@ -84,14 +104,15 @@ export default function LancamentosTab() {
       </div>
 
       {/* Lista */}
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexShrink: 0 }}>
           <div className="card-title" style={{ margin: 0 }}>ÚLTIMOS LANÇAMENTOS</div>
           <div style={{ fontSize: '12px', color: 'var(--text3)' }}>{transactions.length} registros</div>
         </div>
         {transactions.length === 0 ? (
           <EmptyState text="Nenhum lançamento ainda. Faça seu primeiro registro ao lado!" />
         ) : (
+          <div style={{ overflowY: 'auto', maxHeight: '600px', flex: 1 }}>
           <div className="table-wrap">
             <table>
               <thead><tr><th>Descrição</th><th>Cat.</th><th>Data</th><th>Valor</th><th></th></tr></thead>
@@ -116,6 +137,7 @@ export default function LancamentosTab() {
                 ))}
               </tbody>
             </table>
+          </div>
           </div>
         )}
       </div>

@@ -1,9 +1,30 @@
 'use client'
+import { useState, useMemo } from 'react'
 import { useDashboard, fmt, pctOf, todayISO, formatDateBR } from '@/context/DashboardContext'
 import { HealthRing, StatsCard, LimitBar, Chart6Months } from '@/components/ui'
 
 export default function CockpitTab() {
   const { stats, transactions, chartData, setActiveTab, addTransaction } = useDashboard()
+
+  const [selectedMonth, setSelectedMonth] = useState(todayISO().slice(0, 7))
+  const [monthDropOpen, setMonthDropOpen] = useState(false)
+
+  const monthOptions = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => {
+      const d = new Date()
+      d.setDate(1)
+      d.setMonth(d.getMonth() - i)
+      const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      const label = d.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })
+        .replace(/^\w/, c => c.toUpperCase())
+      return { value, label }
+    })
+  }, [])
+
+  const filteredTransactions = useMemo(() =>
+    transactions.filter((t: any) => t.date?.startsWith(selectedMonth)),
+    [transactions, selectedMonth]
+  )
 
   const margem = parseFloat(pctOf(stats.monthProfit, stats.monthRevenue))
   const pctLimit = parseFloat(pctOf(stats.yearRevenue, 81000))
@@ -75,17 +96,41 @@ export default function CockpitTab() {
 
       {/* Atividade + Tarefas */}
       <div className="grid-21">
-        <div className="card">
-          <div className="card-title">ATIVIDADE RECENTE</div>
-          <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {transactions.length === 0 ? (
+        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexShrink: 0 }}>
+            <div className="card-title" style={{ margin: 0 }}>ATIVIDADE RECENTE</div>
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setMonthDropOpen(o => !o)}
+                style={{ fontSize: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '5px 28px 5px 10px', color: 'var(--text)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', fontFamily: 'inherit', position: 'relative' }}
+              >
+                {monthOptions.find(m => m.value === selectedMonth)?.label}
+                <span style={{ position: 'absolute', right: '8px', color: 'rgba(255,255,255,0.3)', fontSize: '10px' }}>▼</span>
+              </button>
+              {monthDropOpen && (
+                <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, background: '#111827', border: '1px solid var(--card-border)', borderRadius: '10px', overflow: 'hidden', zIndex: 200, minWidth: '180px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
+                  {monthOptions.map(m => (
+                    <button
+                      key={m.value}
+                      onClick={() => { setSelectedMonth(m.value); setMonthDropOpen(false) }}
+                      style={{ display: 'block', width: '100%', padding: '9px 14px', background: m.value === selectedMonth ? 'var(--green-dim)' : 'transparent', border: 'none', color: m.value === selectedMonth ? 'var(--green)' : 'var(--text2)', fontSize: '13px', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          <div style={{ overflowY: 'auto', maxHeight: '420px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {filteredTransactions.length === 0 ? (
               <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text3)', fontSize: '13px' }}>
-                Nenhuma movimentação ainda.<br />
+                Nenhuma movimentação neste mês.<br />
                 <button className="btn-add" style={{ marginTop: '12px', fontSize: '12px', padding: '8px 16px' }}
                   onClick={() => setActiveTab('lancamentos')}>Fazer primeiro lançamento →</button>
               </div>
-            ) : transactions.slice(0, 6).map((t: any) => (
-              <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px' }}>
+            ) : filteredTransactions.map((t: any) => (
+              <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px', flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                   <div style={{
                     width: '32px', height: '32px', border: '1px solid var(--card-border)', borderRadius: '8px',

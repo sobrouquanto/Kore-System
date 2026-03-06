@@ -269,10 +269,13 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     const biz  = u.user_metadata?.business_name || 'Meu Negócio'
     setUserName(name)
     setUserBiz(biz)
-    setAiMessages([{
-      role: 'ai',
-      text: `Oi, ${name.split(' ')[0]}! 👋 Sou sua IA financeira. Pergunte qualquer coisa sobre o negócio em linguagem normal.`
-    }])
+    setAiMessages((prev: AiMessage[]) => {
+      if (prev.length > 1) return prev
+      return [{
+        role: 'ai',
+        text: `Oi, ${name.split(' ')[0]}! 👋 Sou sua IA financeira. Pergunte qualquer coisa sobre o negócio em linguagem normal.`
+    }]
+  })
 
     const { first, last } = monthRange()
     const now = new Date()

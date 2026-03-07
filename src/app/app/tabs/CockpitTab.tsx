@@ -1,13 +1,13 @@
 'use client'
 import { useState, useMemo } from 'react'
 import { useDashboard, fmt, pctOf, todayISO, formatDateBR } from '@/context/DashboardContext'
-import { HealthRing, StatsCard, LimitBar, Chart6Months } from '@/components/ui'
+import { HealthRing, LimitBar, Chart6Months } from '@/components/ui'
 
 export default function CockpitTab() {
-  const { stats, transactions, chartData, setActiveTab, addTransaction } = useDashboard()
+  const { stats, transactions, chartData, setActiveTab } = useDashboard()
 
-  const [selectedMonth, setSelectedMonth]   = useState(todayISO().slice(0, 7))
-  const [monthDropOpen, setMonthDropOpen]   = useState(false)
+  const [selectedMonth, setSelectedMonth] = useState(todayISO().slice(0, 7))
+  const [monthDropOpen, setMonthDropOpen] = useState(false)
 
   const monthOptions = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => {
@@ -26,19 +26,42 @@ export default function CockpitTab() {
     [transactions, selectedMonth]
   )
 
-  // Sprint 3: usa lucro do negócio (sem pessoal) no health score e margem
-  const margem    = parseFloat(pctOf(stats.monthProfitNet ?? stats.monthProfit, stats.monthRevenueNet ?? stats.monthRevenue))
-  const pctLimit  = parseFloat(pctOf(stats.yearRevenue, 81000))
-  const limitColor = pctLimit > 80 ? 'var(--red)' : pctLimit > 60 ? 'var(--amber)' : 'var(--green)'
-
-  const thisMonth       = todayISO().slice(0, 7)
-  const dasPaidThisMonth = transactions.some(
-    (t: any) => t.description === 'DAS Mensal' && t.type === 'out' && t.date?.startsWith(thisMonth)
+  // ── Saldo acumulado: histórico total de todas as transações ──────────────
+  const saldoAcumulado = useMemo(() =>
+    transactions.reduce((acc: number, t: any) =>
+      t.type === 'in' ? acc + t.value : acc - t.value, 0
+    ),
+    [transactions]
   )
+
+  // ── Lucro Real: receita do mês − despesas do mês − DAS pago no mês ──────
+  const thisMonth = todayISO().slice(0, 7)
+
+  const dasPaidThisMonth = useMemo(() =>
+    transactions.some(
+      (t: any) => t.description === 'DAS Mensal' && t.type === 'out' && t.date?.startsWith(thisMonth)
+    ),
+    [transactions, thisMonth]
+  )
+
+  const dasValorMes = useMemo(() =>
+    transactions
+      .filter((t: any) => t.description === 'DAS Mensal' && t.type === 'out' && t.date?.startsWith(thisMonth))
+      .reduce((acc: number, t: any) => acc + t.value, 0),
+    [transactions, thisMonth]
+  )
+
+  const lucroReal = (stats.monthRevenueNet ?? stats.monthRevenue)
+    - (stats.monthExpensesNet ?? stats.monthExpenses ?? 0)
+    - dasValorMes
+
+  const margem   = parseFloat(pctOf(lucroReal, stats.monthRevenueNet ?? stats.monthRevenue))
+  const pctLimit = parseFloat(pctOf(stats.yearRevenue, 81000))
+  const limitColor = pctLimit > 80 ? 'var(--red)' : pctLimit > 60 ? 'var(--amber)' : 'var(--green)'
 
   return (
     <>
-      {/* ── DAS Alert (idêntico ao original) ─────────────────────────────── */}
+      {/* ── Alerta DAS ─────────────────────────────────────────────────────── */}
       {!dasPaidThisMonth && (
         <div className="alert card-amber" style={{ marginBottom: '20px' }}>
           <div style={{ fontSize: '20px', flexShrink: 0 }}>⚠️</div>
@@ -57,7 +80,7 @@ export default function CockpitTab() {
         </div>
       )}
 
-      {/* ── Sprint 3: banner se tiver transações importadas este mês ─────── */}
+      {/* ── Banner banco ───────────────────────────────────────────────────── */}
       {stats.bankSyncCount > 0 && selectedMonth === thisMonth && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', padding: '10px 14px', background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', borderRadius: '10px', fontSize: '13px', color: 'var(--text2)' }}>
           🏦 <strong style={{ color: '#93c5fd' }}>{stats.bankSyncCount}</strong> transações importadas do banco este mês —
@@ -67,30 +90,46 @@ export default function CockpitTab() {
         </div>
       )}
 
-      {/* ── KPI Grid (usa métricas do negócio) ───────────────────────────── */}
+      {/* ── KPI Grid ───────────────────────────────────────────────────────── */}
       <div className="grid-4" style={{ marginBottom: '20px' }}>
+
+        {/* Card 1: Saldo Acumulado (histórico total) */}
         <div className="card card-green">
           <div className="card-title">SALDO DO NEGÓCIO</div>
-          <div className="card-value" style={{ color: 'var(--green)' }}>{fmt(stats.monthProfitNet ?? stats.monthProfit)}</div>
-          <div className="card-sub">Receita − Despesas do mês</div>
+          <div className="card-value" style={{ color: saldoAcumulado >= 0 ? 'var(--green)' : 'var(--red)' }}>
+            {fmt(saldoAcumulado)}
+          </div>
+          <div className="card-sub">Acumulado histórico</div>
         </div>
+
+        {/* Card 2: Receita do mês */}
         <div className="card">
           <div className="card-title">RECEITA DO MÊS</div>
-          <div className="card-value" style={{ color: '#6ee7b7' }}>{fmt(stats.monthRevenueNet ?? stats.monthRevenue)}</div>
+          <div className="card-value" style={{ color: '#6ee7b7' }}>
+            {fmt(stats.monthRevenueNet ?? stats.monthRevenue)}
+          </div>
           <div className="card-sub">Total de entradas</div>
         </div>
+
+        {/* Card 3: Lucro Real (pós-DAS) */}
         <div className="card">
           <div className="card-title">LUCRO REAL</div>
-          <div className="card-value" style={{ color: 'var(--green)' }}>{fmt(stats.monthProfitNet ?? stats.monthProfit)}</div>
-          <div style={{ fontSize: '12px', color: 'var(--green)', marginTop: '6px', fontWeight: 700 }}>↑ {margem}% de margem</div>
+          <div className="card-value" style={{ color: lucroReal >= 0 ? 'var(--green)' : 'var(--red)' }}>
+            {fmt(lucroReal)}
+          </div>
+          <div style={{ fontSize: '12px', color: lucroReal >= 0 ? 'var(--green)' : 'var(--red)', marginTop: '6px', fontWeight: 700 }}>
+            {margem}% margem · DAS deduzido
+          </div>
         </div>
+
+        {/* Card 4: Saúde */}
         <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', textAlign: 'center' }}>
           <HealthRing score={stats.healthScore} />
           <div style={{ fontSize: '11px', color: 'var(--text3)', marginTop: '4px' }}>Saúde Financeira</div>
         </div>
       </div>
 
-      {/* ── Limite MEI (idêntico ao original) ────────────────────────────── */}
+      {/* ── Limite MEI ─────────────────────────────────────────────────────── */}
       <div className="card" style={{ marginBottom: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <div>
@@ -105,7 +144,7 @@ export default function CockpitTab() {
         </div>
       </div>
 
-      {/* ── Atividade + Tarefas ───────────────────────────────────────────── */}
+      {/* ── Atividade + Tarefas ────────────────────────────────────────────── */}
       <div className="grid-21">
         <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexShrink: 0 }}>
@@ -113,7 +152,7 @@ export default function CockpitTab() {
             <div style={{ position: 'relative' }}>
               <button
                 onClick={() => setMonthDropOpen(o => !o)}
-                style={{ fontSize: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '5px 28px 5px 10px', color: 'var(--text)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', fontFamily: 'inherit', position: 'relative' }}
+                style={{ fontSize: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '5px 28px 5px 10px', color: 'var(--text)', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', position: 'relative' }}
               >
                 {monthOptions.find(m => m.value === selectedMonth)?.label}
                 <span style={{ position: 'absolute', right: '8px', color: 'rgba(255,255,255,0.3)', fontSize: '10px' }}>▼</span>
@@ -141,21 +180,19 @@ export default function CockpitTab() {
             ) : filteredTransactions.map((t: any) => (
               <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px', flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  {/* Sprint 3: ícone diferente para transações do banco */}
                   <div style={{
                     width: '32px', height: '32px', border: '1px solid var(--card-border)', borderRadius: '8px',
                     color: t.type === 'in' ? 'var(--green)' : 'var(--red)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px',
                     background: t.source === 'bank_sync'
                       ? (t.type === 'in' ? 'rgba(59,130,246,0.12)' : 'rgba(239,68,68,0.1)')
-                      : (t.type === 'in' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'),
+                      : (t.type === 'in' ? 'rgba(16,185,129,0.1)'  : 'rgba(239,68,68,0.1)'),
                   }}>
                     {t.source === 'bank_sync' ? '🏦' : (t.type === 'in' ? '↑' : '↓')}
                   </div>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <div style={{ fontSize: '14px', fontWeight: 600 }}>{t.description}</div>
-                      {/* Sprint 3: badge sutil para gastos pessoais */}
                       {t.is_personal && (
                         <span style={{ fontSize: '10px', color: 'var(--amber)', opacity: 0.7 }}>pessoal</span>
                       )}
@@ -172,17 +209,17 @@ export default function CockpitTab() {
           </div>
         </div>
 
-        {/* ── Tarefas + mini chart (idêntico ao original) ──────────────── */}
+        {/* Tarefas + mini chart */}
         <div className="card card-blue">
           <div className="card-title">⚡ TAREFAS DO DIA</div>
           <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
-              ['💰', 'Lance sua receita de hoje',       'lancamentos'],
-              ['⚠️', 'Verifique o vencimento do DAS',  'financeiro'],
-              ['🤖', 'Pergunte algo para a IA',         'ia'],
+              ['💰', 'Lance sua receita de hoje',      'lancamentos'],
+              ['⚠️', 'Verifique o vencimento do DAS', 'financeiro'],
+              ['🤖', 'Pergunte algo para a IA',        'ia'],
             ].map(([icon, text, tab], i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0', borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none', cursor: 'pointer' }}
-                onClick={() => setActiveTab(tab)}>
+                onClick={() => setActiveTab(tab as any)}>
                 <span style={{ fontSize: '16px' }}>{icon}</span>
                 <span style={{ fontSize: '13px', lineHeight: '1.4' }}>{text}</span>
                 <span style={{ marginLeft: 'auto', color: 'var(--blue)', fontSize: '12px' }}>→</span>

@@ -7,7 +7,7 @@ import { KoreLogo } from '@/components/KoreLogo'
 export type TabId =
   | 'cockpit' | 'financeiro' | 'lancamentos' | 'clientes'
   | 'orcamentos' | 'ia' | 'relatorios' | 'simuladores'
-  | 'integracoes' | 'configuracoes'
+  | 'diagnostico' | 'integracoes' | 'configuracoes'
 
 const NAV_ITEMS: { id: TabId; icon: string; label: string }[] = [
   { id: 'cockpit',       icon: '⚡',  label: 'Cockpit'       },
@@ -18,6 +18,7 @@ const NAV_ITEMS: { id: TabId; icon: string; label: string }[] = [
   { id: 'ia',            icon: '🤖',  label: 'IA Assistente' },
   { id: 'relatorios',    icon: '📈',  label: 'Relatórios'    },
   { id: 'simuladores',   icon: '🧮',  label: 'Simuladores'   },
+  { id: 'diagnostico',   icon: '🩺',  label: 'Diagnóstico'   },
   { id: 'integracoes',   icon: '🔗',  label: 'Integrações'   },
   { id: 'configuracoes', icon: '⚙️', label: 'Configurações' },
 ]
@@ -72,8 +73,10 @@ export default function DashboardLayout({
               {item.id === 'ia' && (
                 <span style={{
                   marginLeft: 'auto', fontSize: '9px',
-                  background: 'var(--green-dim)', border: '1px solid var(--green-border)',
-                  color: 'var(--green)', padding: '2px 6px', borderRadius: '99px', fontWeight: 700,
+                  background: 'var(--primary-dim)',
+                  border: '1px solid var(--primary-border)',
+                  color: 'var(--primary)',
+                  padding: '2px 6px', borderRadius: '99px', fontWeight: 700,
                 }}>AI</span>
               )}
             </button>

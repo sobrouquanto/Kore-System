@@ -14,6 +14,7 @@ const OrcamentosTab    = lazy(() => import('@/app/app/tabs/OrcamentosTab'))
 const IATab            = lazy(() => import('@/app/app/tabs/IATab'))
 const RelatoriosTab    = lazy(() => import('@/app/app/tabs/RelatoriosTab'))
 const SimuladoresTab   = lazy(() => import('@/app/app/tabs/SimuladoresTab'))
+const DiagnosticoTab   = lazy(() => import('@/app/app/tabs/DiagnosticoTab'))
 const IntegracoesTab   = lazy(() => import('@/app/app/tabs/IntegracoesTab'))
 const ConfiguracoesTab = lazy(() => import('@/app/app/tabs/ConfiguracoesTab'))
 
@@ -57,6 +58,7 @@ function Dashboard() {
       case 'ia':            return <IATab />
       case 'relatorios':    return <RelatoriosTab />
       case 'simuladores':   return <SimuladoresTab />
+      case 'diagnostico':   return <DiagnosticoTab />
       // Sprint 3: bug fix — case duplicado removido; ErrorBoundary mantido
       case 'integracoes':   return (
         <ErrorBoundary>

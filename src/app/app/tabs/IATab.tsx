@@ -237,11 +237,11 @@ export default function IATab() {
   }
 
   return (
-    <div className="grid-21">
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", alignItems: "stretch" }}>
 
       {/* ── Chat ─────────────────────────────────────────────────────────── */}
-      <div>
-        <div className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 100px)', minHeight: '500px', maxHeight: '900px' }}>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <div className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%' }}>
 
           {/* Header */}
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>

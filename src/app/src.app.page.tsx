@@ -717,7 +717,7 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  '14 dias grátis',
+                  '7 dias grátis',
                   'Sem cartão de crédito',
                   'Cancele quando quiser',
                 ].map((t) => (
@@ -790,7 +790,7 @@ export default function LandingPage() {
                 {
                   n: 'R$ 29',
                   label: 'Por mês',
-                  sub: '14 dias de trial gratuito',
+                  sub: '7 dias de trial gratuito',
                 },
               ].map(({ n, label, sub }, idx, arr) => (
                 <div
@@ -883,7 +883,7 @@ export default function LandingPage() {
               {
                 n: '01',
                 title: 'Crie sua conta',
-                desc: 'Cadastro em 2 minutos. Sem burocracia, sem cartão. Você tem 14 dias para testar tudo.',
+                desc: 'Cadastro em 2 minutos. Sem burocracia, sem cartão. Você tem 7 dias para testar tudo.',
                 icon: (
                   <svg
                     width="22"
@@ -1324,6 +1324,153 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ── CALCULADORA MEI ── */}
+        <section
+          id="calculadora"
+          style={{ position: 'relative', zIndex: 1, maxWidth: 1200, margin: '0 auto', padding: '100px 40px' }}
+          className="section-wrap"
+        >
+          <div style={{ maxWidth: 560, marginBottom: 60 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 14 }}>CALCULADORA MEI</div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 16 }}>
+              Quanto você pode retirar<br /><span style={{ color: '#3B82F6' }}>este mês?</span>
+            </h2>
+            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>Simule agora, sem precisar criar conta. O Kore faz isso automaticamente todo mês com seus dados reais.</p>
+          </div>
+          <div className="anti-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'start' }}>
+            <div style={{ background: 'linear-gradient(180deg,rgba(13,17,23,0.98),rgba(10,14,20,0.98))', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 36, boxShadow: '0 20px 60px rgba(0,0,0,0.35)' }}>
+              {([
+                { id: 'calc-receita', label: 'Receita bruta do mês', min: 500, max: 6750, step: 100, def: 4000 },
+                { id: 'calc-despesas', label: 'Despesas do mês', min: 0, max: 4000, step: 100, def: 1200 },
+                { id: 'calc-anual', label: 'Faturamento acumulado no ano', min: 0, max: 81000, step: 1000, def: 28000 },
+              ] as {id:string;label:string;min:number;max:number;step:number;def:number}[]).map(({ id, label, min, max, step, def }) => (
+                <div key={id} style={{ marginBottom: 28 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase' as const }}>{label}</span>
+                    <span id={`${id}-val`} style={{ fontSize: 14, fontWeight: 700, color: '#60a5fa', fontFamily: "'IBM Plex Mono', monospace" }}>R$ {def.toLocaleString('pt-BR')}</span>
+                  </div>
+                  <input type="range" id={id} min={min} max={max} step={step} defaultValue={def} style={{ width: '100%', accentColor: '#3B82F6', cursor: 'pointer' }}
+                    onChange={() => {
+                      const r = (document.getElementById('calc-receita') as HTMLInputElement)?.valueAsNumber || 4000
+                      const d = (document.getElementById('calc-despesas') as HTMLInputElement)?.valueAsNumber || 1200
+                      const a = (document.getElementById('calc-anual') as HTMLInputElement)?.valueAsNumber || 28000
+                      const fmt = (v: number) => 'R$ ' + Math.round(v).toLocaleString('pt-BR')
+                      const lucro = r - d; const das = Math.round(r * 0.06); const reserva = Math.round((lucro - das) * 0.2); const retirada = Math.max(0, lucro - das - reserva); const limite = ((a / 81000) * 100).toFixed(1)
+                      ;(document.getElementById('calc-receita-val') as HTMLElement).textContent = fmt(r)
+                      ;(document.getElementById('calc-despesas-val') as HTMLElement).textContent = fmt(d)
+                      ;(document.getElementById('calc-anual-val') as HTMLElement).textContent = fmt(a)
+                      ;(document.getElementById('res-lucro') as HTMLElement).textContent = fmt(lucro)
+                      ;(document.getElementById('res-das') as HTMLElement).textContent = fmt(das)
+                      ;(document.getElementById('res-reserva') as HTMLElement).textContent = fmt(reserva)
+                      ;(document.getElementById('res-retirada') as HTMLElement).textContent = fmt(retirada)
+                      const limEl = document.getElementById('res-limite') as HTMLElement
+                      limEl.textContent = limite + '%'
+                      limEl.style.color = +limite > 80 ? '#f87171' : +limite > 60 ? '#f59e0b' : '#34d399'
+                    }}
+                  />
+                </div>
+              ))}
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, overflow: 'hidden' }}>
+                {([
+                  { label: 'Lucro bruto', id: 'res-lucro', def: 'R$ 2.800', color: '#34d399', big: false },
+                  { label: 'DAS estimado (6%)', id: 'res-das', def: 'R$ 240', color: '#f59e0b', big: false },
+                  { label: 'Reserva segura (20%)', id: 'res-reserva', def: 'R$ 512', color: 'rgba(255,255,255,0.4)', big: false },
+                  { label: 'Retirada recomendada', id: 'res-retirada', def: 'R$ 2.048', color: '#60a5fa', big: true },
+                  { label: 'Limite MEI usado', id: 'res-limite', def: '34.6%', color: '#f59e0b', big: false },
+                ] as {label:string;id:string;def:string;color:string;big:boolean}[]).map(({ label, id, def, color, big }, idx, arr) => (
+                  <div key={id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 18px', borderBottom: idx < arr.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none', background: big ? 'rgba(59,130,246,0.05)' : 'transparent' }}>
+                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', fontWeight: big ? 700 : 400 }}>{label}</span>
+                    <span id={id} style={{ fontSize: big ? 18 : 13, fontWeight: 700, color, fontFamily: "'IBM Plex Mono', monospace" }}>{def}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ paddingTop: 8 }}>
+              <div style={{ background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', borderRadius: 14, padding: 28, marginBottom: 24 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.1em', fontFamily: "'IBM Plex Mono', monospace", marginBottom: 12 }}>COMO CALCULAMOS</div>
+                {([['Lucro bruto','Receita − Despesas'],['DAS','6% da receita bruta (estimativa)'],['Reserva','20% do lucro após DAS'],['Retirada','O que sobra com segurança']] as string[][]).map(([k,v]) => (
+                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: 13 }}>
+                    <span style={{ color: 'rgba(255,255,255,0.4)' }}>{k}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.7)', fontFamily: "'IBM Plex Mono', monospace", fontSize: 12 }}>{v}</span>
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', lineHeight: 1.8, marginBottom: 28 }}>No Kore, esse cálculo é feito automaticamente todo mês com seus dados reais — receitas sincronizadas do banco, DAS calculado e reserva sugerida. Você abre o app e já sabe o número.</p>
+              <Link href="/login?mode=signup" className="kore-btn-primary">Quero ver meu número real →</Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SCORE DE SAÚDE ── */}
+        <section style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.015)', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(6px)' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 40px' }} className="section-wrap">
+            <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 60px' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 14 }}>SCORE DE SAÚDE</div>
+              <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 16 }}>
+                Seu negócio está<br /><span style={{ color: '#3B82F6' }}>saudável?</span>
+              </h2>
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>O Kore calcula um score de 0 a 100 baseado nos seus dados financeiros reais — e explica cada fator.</p>
+            </div>
+            <div className="anti-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center' }}>
+              <div style={{ background: 'linear-gradient(180deg,rgba(13,17,23,0.98),rgba(10,14,20,0.98))', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '40px 36px', boxShadow: '0 20px 60px rgba(0,0,0,0.35)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+                  <div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em', fontFamily: "'IBM Plex Mono', monospace", marginBottom: 6 }}>HEALTH SCORE</div>
+                    <div style={{ fontSize: 56, fontWeight: 800, fontFamily: "'IBM Plex Mono', monospace", color: '#3B82F6', lineHeight: 1, letterSpacing: '-0.04em' }}>72</div>
+                    <div style={{ fontSize: 12, color: '#60a5fa', marginTop: 6, fontWeight: 600 }}>Atenção necessária ⚠️</div>
+                  </div>
+                  <svg width="80" height="80" viewBox="0 0 80 80">
+                    <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8"/>
+                    <circle cx="40" cy="40" r="34" fill="none" stroke="#3B82F6" strokeWidth="8" strokeDasharray={`${2*Math.PI*34*0.72} ${2*Math.PI*34}`} strokeLinecap="round" transform="rotate(-90 40 40)"/>
+                    <text x="40" y="44" textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="11" fontFamily="IBM Plex Mono">72/100</text>
+                  </svg>
+                </div>
+                {([
+                  { label: 'Margem de lucro', score: 68, detail: '42% de margem · ideal ≥ 40%', weight: '35%' },
+                  { label: 'Uso do limite MEI', score: 85, detail: '34% usado · restam R$53.580', weight: '25%' },
+                  { label: 'Obrigações fiscais', score: 100, detail: 'DAS pago este mês ✓', weight: '20%' },
+                  { label: 'Cobranças em dia', score: 50, detail: '2 cobranças vencidas', weight: '10%' },
+                  { label: 'Tendência de lucro', score: 60, detail: '-8% vs mês anterior', weight: '10%' },
+                ] as {label:string;score:number;detail:string;weight:string}[]).map(({ label, score, detail, weight }) => {
+                  const barColor = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#f87171'
+                  return (
+                    <div key={label} style={{ marginBottom: 18 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                        <div><span style={{ fontSize: 13, fontWeight: 600 }}>{label}</span><span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginLeft: 6, fontFamily: "'IBM Plex Mono', monospace" }}>({weight})</span></div>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: barColor, fontFamily: "'IBM Plex Mono', monospace" }}>{score}</span>
+                      </div>
+                      <div style={{ height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.06)' }}>
+                        <div style={{ height: '100%', width: `${score}%`, background: barColor, borderRadius: 99 }} />
+                      </div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 4, fontFamily: "'IBM Plex Mono', monospace" }}>{detail}</div>
+                    </div>
+                  )
+                })}
+              </div>
+              <div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  {([
+                    { icon: '📊', title: 'Baseado nos seus dados reais', desc: 'Margem de lucro, limite MEI, DAS em dia, cobranças vencidas e tendência mensal. Não é um número genérico.' },
+                    { icon: '🔔', title: 'Alertas antes do problema', desc: 'O score cai antes de você perceber. O Kore te avisa quando algo muda — margem caindo, despesas subindo, DAS esquecido.' },
+                    { icon: '📈', title: 'Acompanhe a evolução', desc: 'Veja como seu score evoluiu ao longo dos meses e o que fez a diferença. Visualização histórica completa.' },
+                  ] as {icon:string;title:string;desc:string}[]).map(({ icon, title, desc }) => (
+                    <div key={title} style={{ display: 'flex', gap: 18, padding: '20px 24px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14 }}>
+                      <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>{icon}</span>
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{title}</div>
+                        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.42)', lineHeight: 1.7 }}>{desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop: 32 }}>
+                  <Link href="/login?mode=signup" className="kore-btn-primary">Ver meu score agora →</Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ── PRICING ── */}
         <section
           id="precos"
@@ -1449,7 +1596,7 @@ export default function LandingPage() {
                   marginBottom: 32,
                 }}
               >
-                Após os 14 dias de trial gratuito
+                Após os 7 dias de trial gratuito
               </p>
 
               <div style={{ textAlign: 'left', marginBottom: 32 }}>
@@ -1497,7 +1644,7 @@ export default function LandingPage() {
                   borderRadius: 12,
                 }}
               >
-                Começar 14 dias grátis →
+                Começar 7 dias grátis →
               </Link>
 
               <p
@@ -1513,111 +1660,105 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── CTA FINAL ── */}
-        <section
-          style={{
-            position: 'relative',
-            zIndex: 1,
-            maxWidth: 800,
-            margin: '0 auto',
-            padding: '100px 40px',
-            textAlign: 'center',
-          }}
-          className="section-wrap"
-        >
-          <div
-            className="cta-box"
-            style={{
-              display: 'inline-block',
-              background: 'rgba(59,130,246,0.06)',
-              border: '1px solid rgba(59,130,246,0.15)',
-              borderRadius: 20,
-              padding: '60px 80px',
-              boxShadow: '0 0 80px rgba(59,130,246,0.06)',
-            }}
-          >
-            <h2
-              style={{
-                fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
-                fontWeight: 800,
-                letterSpacing: '-0.04em',
-                lineHeight: 1.1,
-                marginBottom: 16,
-              }}
-            >
-              Você não precisa de mais
-              <br />
-              cursos. Precisa de <span style={{ color: '#3B82F6' }}>dado.</span>
+        {/* ── DEPOIMENTOS ── */}
+        <section style={{ position: 'relative', zIndex: 1, maxWidth: 1200, margin: '0 auto', padding: '100px 40px' }} className="section-wrap">
+          <div style={{ maxWidth: 560, marginBottom: 60 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 14 }}>QUEM USA</div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+              MEIs que passaram a entender<br /><span style={{ color: '#3B82F6' }}>as próprias finanças.</span>
             </h2>
-            <p
-              style={{
-                color: 'rgba(255,255,255,0.4)',
-                marginBottom: 36,
-                fontSize: 16,
-              }}
-            >
-              Comece hoje. Sem cartão. Sem complicação.
+          </div>
+          <div className="features-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
+            {([
+              { stars: 5, text: 'Antes eu não sabia nem quanto estava lucrando de verdade. Agora vejo tudo no Cockpit e sei exatamente o que posso retirar.', name: 'Camila R.', biz: 'Designer freelancer · SP', bg: 'rgba(59,130,246,0.15)', color: '#60a5fa', initial: 'C' },
+              { stars: 5, text: 'A IA me avisou que ia bater o limite do MEI em 2 meses. Consegui me planejar a tempo e abrir uma ME sem susto.', name: 'Rafael M.', biz: 'Dev freelancer · RJ', bg: 'rgba(16,185,129,0.15)', color: '#34d399', initial: 'R' },
+              { stars: 5, text: 'Fotografei os recibos e a IA lançou tudo automaticamente. Economizo umas 3 horas por mês que eu gastava com planilha.', name: 'Ana L.', biz: 'Confeiteira · MG', bg: 'rgba(245,158,11,0.15)', color: '#f59e0b', initial: 'A' },
+            ] as {stars:number;text:string;name:string;biz:string;bg:string;color:string;initial:string}[]).map(({ stars, text, name, biz, bg, color, initial }) => (
+              <div key={name} className="feature-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ color: '#f59e0b', fontSize: 13, letterSpacing: 2, marginBottom: 14 }}>{'★'.repeat(stars)}</div>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, fontStyle: 'italic', flex: 1, marginBottom: 20 }}>"{text}"</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color, flexShrink: 0 }}>{initial}</div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{name}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>{biz}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── FAQ ── */}
+        <section style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.015)', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(6px)' }}>
+          <div style={{ maxWidth: 760, margin: '0 auto', padding: '100px 40px' }} className="section-wrap">
+            <div style={{ textAlign: 'center', marginBottom: 60 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 14 }}>PERGUNTAS FREQUENTES</div>
+              <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1 }}>Dúvidas comuns.</h2>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {([
+                { q: 'Precisa de conhecimento contábil para usar?', a: 'Não. O Kore foi feito para MEIs que não são contadores. Tudo em linguagem simples e a IA responde suas dúvidas do dia a dia.' },
+                { q: 'O Kore substitui o contador?', a: 'Não substitui — complementa. O Kore cuida da gestão diária: lançamentos, controle de caixa, limite do MEI. O contador faz a parte legal e fiscal. Muitos usuários mostram os relatórios do Kore para o contador e economizam tempo.' },
+                { q: 'O DAS é calculado automaticamente?', a: 'O Kore calcula e avisa quando o DAS está próximo do vencimento (dia 20). O pagamento é feito no portal do PGMEI — o Kore te lembra e mostra o valor estimado.' },
+                { q: 'Posso cancelar a qualquer momento?', a: 'Sim. Sem fidelidade, sem multa, sem burocracia. Cancele pelo próprio dashboard em menos de 1 minuto.' },
+                { q: 'Meus dados financeiros ficam seguros?', a: 'Sim. Usamos Supabase com criptografia em repouso e em trânsito. Seus dados nunca são vendidos ou compartilhados com terceiros.' },
+                { q: 'Funciona com qualquer banco?', a: 'A sincronização via Open Finance (Pluggy) funciona com os principais bancos do Brasil: Itaú, Bradesco, Nubank, Banco do Brasil, Caixa, Santander e outros.' },
+              ] as {q:string;a:string}[]).map(({ q, a }, i) => (
+                <details key={i} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, overflow: 'hidden' }}>
+                  <summary style={{ padding: '20px 24px', fontSize: 15, fontWeight: 600, cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, userSelect: 'none' as const }}>
+                    {q}<span style={{ color: '#3B82F6', fontSize: 18, flexShrink: 0, fontWeight: 400 }}>+</span>
+                  </summary>
+                  <div style={{ padding: '0 24px 20px', fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8 }}>{a}</div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA FINAL ── */}
+        <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', padding: '100px 40px', textAlign: 'center' }} className="section-wrap">
+          <div className="cta-box" style={{ background: 'linear-gradient(135deg,rgba(59,130,246,0.12),rgba(29,78,216,0.08))', border: '1px solid rgba(59,130,246,0.2)', borderRadius: 24, padding: '80px 60px', boxShadow: '0 0 80px rgba(59,130,246,0.08)' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 20 }}>// COMECE AGORA</div>
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.4rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: 20 }}>
+              7 dias para entender<br />seu negócio de verdade.
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', marginBottom: 40, fontSize: 16, lineHeight: 1.7 }}>
+              Sem cartão de crédito. Sem configuração complicada.<br />Cancele quando quiser.
             </p>
-            <Link
-              href="/login?mode=signup"
-              className="kore-btn-primary"
-              style={{
-                fontSize: 17,
-                padding: '16px 40px',
-                boxShadow: '0 0 48px rgba(59,130,246,0.3)',
-              }}
-            >
-              Começar gratuitamente →
+            <Link href="/login?mode=signup" className="kore-btn-primary" style={{ fontSize: 17, padding: '16px 44px', boxShadow: '0 0 48px rgba(59,130,246,0.35)' }}>
+              Criar conta grátis →
             </Link>
           </div>
         </section>
 
         {/* ── FOOTER ── */}
-        <footer
-          style={{
-            position: 'relative',
-            zIndex: 1,
-            borderTop: '1px solid rgba(255,255,255,0.06)',
-            padding: '28px 40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 16,
-            maxWidth: 1200,
-            margin: '0 auto',
-          }}
-          className="section-wrap"
-        >
+        <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, maxWidth: 1200, margin: '0 auto' }} className="section-wrap">
           <KLogo size={22} />
-          <div
-            style={{
-              fontSize: 12,
-              color: 'rgba(255,255,255,0.2)',
-              fontFamily: "'IBM Plex Mono', monospace",
-            }}
-          >
-            © 2025 Kore System · kore.app
-          </div>
-          <div style={{ display: 'flex', gap: 24 }}>
-            {[
-              ['Privacidade', '/privacidade'],
-              ['Termos', '/termos'],
-            ].map(([label, href]) => (
-              <Link
-                key={label}
-                href={href}
-                style={{
-                  fontSize: 13,
-                  color: 'rgba(255,255,255,0.3)',
-                  textDecoration: 'none',
-                }}
-              >
-                {label}
-              </Link>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', fontFamily: "'IBM Plex Mono', monospace" }}>© 2026 Kore System · kore.app</div>
+          <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+            <a href="https://wa.me/5521984150001" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Suporte</a>
+            {([['Privacidade','/privacidade'],['Termos','/termos']] as string[][]).map(([label, href]) => (
+              <Link key={label} href={href} style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>{label}</Link>
             ))}
           </div>
         </footer>
+
+        {/* ── BOTÃO FLUTUANTE WHATSAPP ── */}
+        <a
+          href="https://wa.me/5521984150001?text=Olá!%20Preciso%20de%20ajuda%20com%20o%20Kore%20System."
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Falar com suporte"
+          style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 999, width: 56, height: 56, borderRadius: '50%', background: '#25d366', boxShadow: '0 4px 24px rgba(37,211,102,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)';(e.currentTarget as HTMLAnchorElement).style.boxShadow='0 6px 32px rgba(37,211,102,0.55)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform='scale(1)';(e.currentTarget as HTMLAnchorElement).style.boxShadow='0 4px 24px rgba(37,211,102,0.4)' }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+        </a>
+
       </div>
     </>
   )

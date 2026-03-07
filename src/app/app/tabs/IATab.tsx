@@ -241,7 +241,7 @@ export default function IATab() {
 
       {/* ── Chat ─────────────────────────────────────────────────────────── */}
       <div>
-        <div className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 140px)', minHeight: '500px', maxHeight: '820px' }}>
+        <div className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 100px)', minHeight: '500px', maxHeight: '900px' }}>
 
           {/* Header */}
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>

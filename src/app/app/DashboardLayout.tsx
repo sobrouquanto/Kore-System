@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { useDashboard, fmt } from '@/context/DashboardContext'
 import { ConfirmModal, HealthRing } from '@/components/ui'
@@ -55,7 +54,7 @@ export default function DashboardLayout({
       {/* ── SIDEBAR ──────────────────────────────────── */}
       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
 
-        {/* LOGO — KoreLogo substitui o antigo "M" / "MEI 360 OS" */}
+        {/* LOGO */}
         <div className="sidebar-logo">
           <KoreLogo size={32} showName={true} variant="color" />
         </div>
@@ -112,8 +111,14 @@ export default function DashboardLayout({
             <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{userBiz}</div>
           </div>
           <button onClick={doLogout}
-            style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.25)', cursor: 'pointer', fontSize: '16px', padding: '4px', flexShrink: 0 }}
-            title="Sair">⏻</button>
+            style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.25)', cursor: 'pointer', padding: '4px', flexShrink: 0 }}
+            title="Sair">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
         </div>
       </aside>
 

@@ -179,9 +179,7 @@ function OnboardingFlow() {
 
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '40px' }}>
-          <div style={{ width: '32px', height: '32px', background: 'rgba(46,98,255,0.15)', border: '1px solid rgba(46,98,255,0.25)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="16" height="16" viewBox="0 0 28 28" fill="none"><path d="M7 6L7 22M7 14L16 6M7 14L16 22" stroke="#2E62FF" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </div>
+          <img src="/kore-logo.png" alt="Kore" width={32} height={32} style={{ borderRadius: '6px' }} />
           <div style={{ fontSize: '16px', fontWeight: 800, letterSpacing: '-0.3px' }}>Kore</div>
         </div>
 

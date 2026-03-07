@@ -38,11 +38,7 @@ function BackButton({ href, label = 'Voltar' }: { href: string; label?: string }
 function KoreLogo() {
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-      <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
-        <path d="M8 5 L8 27"   stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
-        <path d="M8 16 L24 5"  stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
-        <path d="M8 16 L24 27" stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
-      </svg>
+      <img src="/kore-logo.png" alt="Kore" width={32} height={32} style={{ borderRadius: '6px' }} />
       <div style={{ fontSize: '22px', fontWeight: 900, color: '#f1f5f9', letterSpacing: '-0.5px' }}>
         Kore <span style={{ color: 'rgba(255,255,255,0.35)', fontWeight: 400, fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>System</span>
       </div>

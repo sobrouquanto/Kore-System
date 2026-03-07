@@ -102,7 +102,7 @@ export default function ConfiguracoesTab() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
           {[
-            ['Plano', planActive ? 'MEI 360 OS · Completo' : 'Trial gratuito'],
+            ['Plano', planActive ? 'Plano KoreSystem' : 'Trial gratuito'],
             ['Valor', planActive ? 'R$ 29,00/mês' : 'Gratuito'],
             ['Status', planActive ? 'Ativo' : trialExpired ? 'Expirado' : 'Em avaliação'],
             ['Membro desde', user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : '—'],

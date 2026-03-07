@@ -4,35 +4,34 @@
    DESIGN TOKENS
    ============================================================ */
 :root {
-  --bg:           #0B0B0F;
-  --bg2:          #1E1F24;
-  --card:         rgba(255,255,255,0.04);
-  --card-border:  rgba(255,255,255,0.07);
+  --bg: #060a12;
+  --bg2: #0d1220;
+  --card: rgba(255,255,255,0.04);
+  --card-border: rgba(255,255,255,0.07);
 
-  /* Azul Kore — cor primária de ação */
-  --blue:         #3B82F6;
-  --blue2:        #2563eb;
-  --blue-dim:     rgba(59,130,246,0.12);
-  --blue-border:  rgba(59,130,246,0.25);
+  /* AZUL como cor primária (era verde) */
+  --primary: #3b82f6;
+  --primary2: #2563eb;
+  --primary-dim: rgba(59,130,246,0.15);
+  --primary-border: rgba(59,130,246,0.25);
 
-  /* Verde — mantido apenas para badges AI, alertas positivos pontuais */
-  --green:        #10b981;
-  --green2:       #059669;
-  --green-dim:    rgba(16,185,129,0.12);
-  --green-border: rgba(16,185,129,0.22);
+  /* Verde mantido APENAS para valores positivos / lucro */
+  --green: #10b981;
+  --green2: #059669;
+  --green-dim: rgba(16,185,129,0.15);
+  --green-border: rgba(16,185,129,0.25);
 
-  --red:          #ef4444;
-  --red-dim:      rgba(239,68,68,0.12);
-  --amber:        #f59e0b;
-
-  --text:         #f1f5f9;
-  --text2:        rgba(255,255,255,0.55);
-  --text3:        rgba(255,255,255,0.3);
-
-  --mono:         'JetBrains Mono', 'DM Mono', monospace;
-  --sans:         'Inter', sans-serif;
-
-  --sidebar-w:    240px;
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --blue: #3b82f6;
+  --blue-dim: rgba(59,130,246,0.12);
+  --amber: #f59e0b;
+  --text: #f1f5f9;
+  --text2: rgba(255,255,255,0.55);
+  --text3: rgba(255,255,255,0.3);
+  --mono: 'DM Mono', monospace;
+  --sans: 'Sora', sans-serif;
+  --sidebar-w: 240px;
 }
 
 /* ============================================================
@@ -48,18 +47,18 @@ body {
   overflow-x: hidden;
 }
 
-button        { font-family: inherit; }
+button { font-family: inherit; }
 input, select, textarea { font-family: inherit; }
 
 /* ============================================================
-   AMBIENT LIGHT FX
+   AMBIENT LIGHT FX — azul como orb principal
    ============================================================ */
 .ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 .amb-orb { position: absolute; border-radius: 50%; }
 .amb-1 { width: 800px; height: 800px; top: -300px; left: 20%;
-         background: radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%); }
+  background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%); }
 .amb-2 { width: 600px; height: 600px; bottom: -200px; right: 5%;
-         background: radial-gradient(circle, rgba(59,130,246,0.035) 0%, transparent 70%); }
+  background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%); }
 
 /* ============================================================
    DASHBOARD SHELL
@@ -106,26 +105,32 @@ input, select, textarea { font-family: inherit; }
    SIDEBAR — peças internas
    ============================================================ */
 .sidebar-logo {
-  padding: 24px 20px 16px;
+  padding: 20px 20px 16px;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
   border-bottom: 1px solid var(--card-border);
   flex-shrink: 0;
+  letter-spacing: -0.3px;
 }
 
-/* Mantido para retrocompat — não usado com KoreLogo */
-.sidebar-logo span { color: var(--blue); }
+/* Logo SVG container — sem fundo, direto o SVG */
 .sidebar-logo-icon {
-  width: 34px; height: 34px;
-  background: var(--blue-dim);
-  border: 1px solid var(--blue-border);
-  border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 900; color: var(--blue);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+}
+
+.sidebar-logo-text {
+  color: var(--text);
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.3px;
 }
 
 .sidebar-nav {
@@ -139,8 +144,8 @@ input, select, textarea { font-family: inherit; }
   margin: 0 12px 12px;
   padding: 14px;
   border-radius: 12px;
-  border: 1px solid var(--blue-border);
-  background: var(--blue-dim);
+  border: 1px solid var(--primary-border);
+  background: var(--primary-dim);
   flex-shrink: 0;
 }
 
@@ -155,14 +160,15 @@ input, select, textarea { font-family: inherit; }
 
 .sidebar-user-avatar {
   width: 32px; height: 32px;
-  background: var(--blue-dim);
-  border: 1px solid var(--blue-border);
+  background: var(--primary-dim);
+  border: 1px solid var(--primary-border);
   border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 800; color: var(--blue);
+  font-size: 13px; font-weight: 800; color: var(--primary);
   flex-shrink: 0;
 }
 
+/* Mobile overlay */
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -172,7 +178,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* ============================================================
-   NAV ITEMS
+   NAV ITEMS — azul como cor ativa
    ============================================================ */
 .nav-item {
   display: flex;
@@ -193,19 +199,17 @@ input, select, textarea { font-family: inherit; }
 }
 
 .nav-item:hover { background: var(--card); color: var(--text); }
-
 .nav-item-active {
-  background: var(--blue-dim) !important;
-  color: var(--blue) !important;
-  border-color: var(--blue-border) !important;
+  background: var(--primary-dim) !important;
+  color: var(--primary) !important;
+  border-color: var(--primary-border) !important;
 }
 
-.nav-icon  { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
 .nav-label { flex: 1; }
 .nav-section-label {
-  font-size: 10px; color: var(--text3); font-weight: 700;
-  letter-spacing: 2px; text-transform: uppercase;
-  padding: 15px 10px 5px;
+  font-size: 10px; color: var(--text3); font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; padding: 15px 10px 5px;
 }
 
 /* ============================================================
@@ -217,7 +221,7 @@ input, select, textarea { font-family: inherit; }
   justify-content: space-between;
   padding: 16px 28px;
   border-bottom: 1px solid var(--card-border);
-  background: rgba(11,11,15,0.88);
+  background: rgba(6,10,18,0.85);
   backdrop-filter: blur(10px);
   flex-shrink: 0;
   gap: 16px;
@@ -225,8 +229,18 @@ input, select, textarea { font-family: inherit; }
   z-index: 50;
 }
 
-.topbar-stats { display: flex; align-items: center; gap: 24px; }
-.topbar-stat  { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.topbar-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.topbar-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
 
 .hamburger {
   display: none;
@@ -250,14 +264,18 @@ input, select, textarea { font-family: inherit; }
   padding: 20px;
 }
 
-.card-green  { background: linear-gradient(135deg,rgba(16,185,129,0.10),rgba(16,185,129,0.03)); border-color: var(--green-border); }
-.card-blue   { background: var(--blue-dim); border-color: var(--blue-border); }
-.card-red    { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.2); }
-.card-amber  { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
+/* card-green mantido para lucro / positivo */
+.card-green { background: linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04)); border-color: var(--green-border); }
+
+/* card-blue agora é o destaque principal */
+.card-blue { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.25); }
+.card-primary { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.25); }
+.card-red { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); }
+.card-amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
 
 .card-title { font-size: 11px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
 .card-value { font-size: 28px; font-weight: 800; font-family: var(--mono); line-height: 1.1; margin-top: 8px; }
-.card-sub   { font-size: 12px; color: var(--text3); margin-top: 6px; }
+.card-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
 
 /* ============================================================
    ALERT BANNER
@@ -273,65 +291,84 @@ input, select, textarea { font-family: inherit; }
 /* ============================================================
    GRIDS
    ============================================================ */
-.grid-4  { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
-.grid-3  { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-.grid-2  { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
-.grid-21 { display: grid; grid-template-columns: 2fr 1fr;       gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+.grid-21 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
 
 /* ============================================================
    LIMIT BAR
    ============================================================ */
-.limit-bar      { height: 8px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
+.limit-bar { height: 8px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
 .limit-bar-fill { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
 
 /* ============================================================
    6-MONTH CHART
    ============================================================ */
-.chart-container  { display: flex; gap: 6px; align-items: flex-end; }
-.chart-bar-group  { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
-.chart-bars       { display: flex; gap: 3px; width: 100%; }
-.cb               { flex: 1; border-radius: 4px 4px 0 0; min-height: 2px; transition: height 0.6s ease; }
-.chart-label      { font-size: 10px; color: var(--text3); font-weight: 600; white-space: nowrap; }
+.chart-container { display: flex; gap: 6px; align-items: flex-end; }
+.chart-bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.chart-bars { display: flex; gap: 3px; width: 100%; }
+.cb { flex: 1; border-radius: 4px 4px 0 0; min-height: 2px; transition: height 0.6s ease; }
+.chart-label { font-size: 10px; color: var(--text3); font-weight: 600; white-space: nowrap; }
 
 /* ============================================================
    TRANSACTION TABLE
    ============================================================ */
-.table-wrap { overflow-x: auto; border-radius: 12px; }
-.table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.table-wrap th {
-  text-align: left; font-size: 10px; color: var(--text3);
-  text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
-  padding: 10px 12px; border-bottom: 1px solid var(--card-border);
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
 }
-.table-wrap td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
-.table-wrap tr:last-child td { border-bottom: none; }
 
-.tx-in  { color: var(--green); font-family: var(--mono); font-weight: 700; }
-.tx-out { color: var(--red);   font-family: var(--mono); font-weight: 700; }
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table-wrap th {
+  text-align: left;
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.table-wrap td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  vertical-align: middle;
+}
+
+.table-wrap tr:last-child td { border-bottom: none; }
+.tx-in { color: var(--green); font-family: var(--mono); font-weight: 700; }
+.tx-out { color: var(--red); font-family: var(--mono); font-weight: 700; }
 
 /* ============================================================
    BADGES
    ============================================================ */
-.badge       { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
-.badge-green { background: var(--green-dim);              color: var(--green); }
-.badge-red   { background: var(--red-dim);                color: var(--red);   }
-.badge-amber { background: rgba(245,158,11,0.15);         color: var(--amber); }
-.badge-blue  { background: var(--blue-dim);               color: var(--blue);  }
-.badge-gray  { background: rgba(255,255,255,0.07);        color: var(--text3); }
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-red { background: var(--red-dim); color: var(--red); }
+.badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+.badge-blue { background: var(--primary-dim); color: var(--primary); }
+.badge-gray { background: rgba(255,255,255,0.07); color: var(--text3); }
 
 /* ============================================================
-   BUTTONS
+   BUTTONS — azul como primário
    ============================================================ */
 .btn-primary {
-  background: linear-gradient(135deg, var(--blue), var(--blue2));
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
   color: #fff; border: none; padding: 10px 20px;
   border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px;
 }
 
 .btn-add {
-  background: var(--blue-dim);
-  border: 1px solid var(--blue-border);
-  color: var(--blue);
+  background: var(--primary-dim);
+  border: 1px solid var(--primary-border);
+  color: var(--primary);
   padding: 9px 18px;
   border-radius: 10px;
   font-size: 13px;
@@ -340,7 +377,8 @@ input, select, textarea { font-family: inherit; }
   transition: background 0.15s;
   white-space: nowrap;
 }
-.btn-add:hover    { background: rgba(59,130,246,0.22); }
+
+.btn-add:hover { background: rgba(59,130,246,0.22); }
 .btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-ghost-sm {
@@ -353,6 +391,7 @@ input, select, textarea { font-family: inherit; }
   font-weight: 600;
   cursor: pointer;
 }
+
 .btn-ghost-sm:hover { background: rgba(255,255,255,0.08); color: var(--text); }
 
 /* ============================================================
@@ -374,14 +413,15 @@ input, select, textarea { font-family: inherit; }
   transition: border-color 0.15s;
   width: 100%;
 }
+
 .form-group-sm input:focus,
 .form-group-sm select:focus,
-.form-group-sm textarea:focus { border-color: var(--blue-border); }
+.form-group-sm textarea:focus { border-color: var(--primary-border); }
 
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 
 /* ============================================================
-   TOGGLE GROUP (Entrada / Saída)
+   TOGGLE GROUP — azul como ativo
    ============================================================ */
 .toggle-group {
   display: flex;
@@ -393,43 +433,61 @@ input, select, textarea { font-family: inherit; }
 }
 
 .toggle-btn {
-  flex: 1; padding: 8px; border-radius: 8px;
-  border: none; cursor: pointer;
-  background: transparent; color: var(--text3);
-  font-weight: 700; font-size: 13px; font-family: inherit;
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text3);
+  font-weight: 700;
+  font-size: 13px;
+  font-family: inherit;
   transition: all 0.15s;
 }
 
 .toggle-btn.active {
-  background: var(--blue-dim);
-  color: var(--blue);
-  border: 1px solid var(--blue-border);
+  background: var(--primary-dim);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
 }
 
 /* ============================================================
    MODAL
    ============================================================ */
 .modal-overlay {
-  position: fixed; inset: 0;
+  position: fixed;
+  inset: 0;
   background: rgba(0,0,0,0.65);
   backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1000; padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
 }
 
 .modal {
   background: #111827;
   border: 1px solid var(--card-border);
-  border-radius: 20px; padding: 28px;
-  width: 100%; max-height: 90vh; overflow-y: auto;
+  border-radius: 20px;
+  padding: 28px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* ============================================================
-   AI CHAT
+   AI CHAT — azul como cor do assistente
    ============================================================ */
 .chat-messages {
-  flex: 1; overflow-y: auto; padding: 20px;
-  display: flex; flex-direction: column; gap: 16px; min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
 }
 
 .msg { display: flex; gap: 10px; align-items: flex-start; }
@@ -437,68 +495,91 @@ input, select, textarea { font-family: inherit; }
 
 .msg-avatar {
   width: 32px; height: 32px; border-radius: 9px;
-  background: var(--blue-dim); border: 1px solid var(--blue-border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; flex-shrink: 0;
+  background: var(--primary-dim);
+  border: 1px solid var(--primary-border);
+  display: flex; align-items: center;
+  justify-content: center; font-size: 14px; flex-shrink: 0;
 }
 
 .msg-bubble {
   background: var(--card); border: 1px solid var(--card-border);
-  border-radius: 12px; padding: 10px 14px;
-  font-size: 13px; line-height: 1.55; max-width: 85%;
+  border-radius: 12px; padding: 10px 14px; font-size: 13px; line-height: 1.55;
+  max-width: 85%;
 }
 
 .msg-user .msg-bubble {
-  background: var(--blue-dim); border-color: var(--blue-border);
+  background: var(--primary-dim); border-color: var(--primary-border);
   color: var(--text); margin-left: auto;
 }
 
 .typing-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--blue);
+  width: 6px; height: 6px; border-radius: 50%; background: var(--primary);
   display: inline-block; margin: 0 2px;
   animation: typingBounce 1s infinite ease-in-out;
 }
 .typing-dot:nth-child(2) { animation-delay: 0.15s; }
-.typing-dot:nth-child(3) { animation-delay: 0.3s;  }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
 
 @keyframes typingBounce {
   0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-  40%           { transform: translateY(-5px); opacity: 1; }
+  40% { transform: translateY(-5px); opacity: 1; }
 }
 
 .ai-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 20px 6px; }
 .ai-sug {
-  background: var(--card); border: 1px solid var(--card-border);
-  color: var(--text2); padding: 6px 12px; border-radius: 99px;
-  font-size: 12px; cursor: pointer; font-family: inherit;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  color: var(--text2);
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
   transition: all 0.15s;
 }
-.ai-sug:hover { background: var(--blue-dim); border-color: var(--blue-border); color: var(--blue); }
+.ai-sug:hover { background: var(--primary-dim); border-color: var(--primary-border); color: var(--primary); }
 
 .chat-input-wrap {
-  padding: 12px 16px; border-top: 1px solid var(--card-border);
-  display: flex; gap: 8px; align-items: center; flex-shrink: 0;
+  padding: 12px 16px;
+  border-top: 1px solid var(--card-border);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .chat-input {
-  flex: 1; background: rgba(255,255,255,0.05);
-  border: 1px solid var(--card-border); border-radius: 10px;
-  padding: 10px 14px; color: var(--text); font-size: 13px; outline: none;
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
 }
-.chat-input:focus { border-color: var(--blue-border); }
+
+.chat-input:focus { border-color: var(--primary-border); }
 
 .chat-send {
-  background: var(--blue-dim); border: 1px solid var(--blue-border);
-  color: var(--blue); padding: 10px 16px; border-radius: 10px;
-  font-size: 13px; font-weight: 700; cursor: pointer;
-  white-space: nowrap; font-family: inherit;
+  background: var(--primary-dim);
+  border: 1px solid var(--primary-border);
+  color: var(--primary);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
 }
+
 .chat-send:hover { background: rgba(59,130,246,0.22); }
 
 /* ============================================================
    ANIMATIONS
    ============================================================ */
-@keyframes spin  { to { transform: rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 0.9; } }
 
 /* ============================================================
@@ -512,22 +593,20 @@ input, select, textarea { font-family: inherit; }
     transition: transform 0.25s ease;
     z-index: 200;
   }
-  .sidebar-open    { transform: translateX(0); }
+
+  .sidebar-open { transform: translateX(0); }
   .sidebar-overlay { display: block; }
-  .main            { width: 100%; }
-  .hamburger       { display: block; }
-  .topbar-stats    { gap: 12px; }
-  .page-content    { padding: 16px; }
-  .grid-4,
-  .grid-3          { grid-template-columns: 1fr 1fr; }
-  .grid-21         { grid-template-columns: 1fr; }
-  .form-row        { grid-template-columns: 1fr; }
+  .main { width: 100%; }
+  .hamburger { display: block; }
+  .topbar-stats { gap: 12px; }
+  .page-content { padding: 16px; }
+  .grid-4, .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-21 { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
-  .grid-4,
-  .grid-3,
-  .grid-2       { grid-template-columns: 1fr; }
-  .topbar       { padding: 12px 16px; }
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .topbar { padding: 12px 16px; }
   .topbar-stats { display: none; }
 }

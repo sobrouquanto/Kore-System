@@ -98,5 +98,5 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function GET(): Promise<NextResponse> {
-  return NextResponse.json({ status: 'MEI 360 OS webhook ativo' })
+  return NextResponse.json({ status: 'Kore System webhook ativo' })
 }

@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const { message, imageBase64, imageMediaType, financialContext } = body
 
     // ── Monta system prompt com contexto financeiro real do usuário ──────────
-    const systemPrompt = `Você é a IA financeira do MEI 360 OS — assistente pessoal de negócios do ${financialContext.userName} (${financialContext.userBiz}).
+    const systemPrompt = `Você é a IA financeira do Kore System — assistente pessoal de negócios do ${financialContext.userName} (${financialContext.userBiz}).
 
 DADOS FINANCEIROS ATUAIS DO USUÁRIO:
 - Receita do mês: ${financialContext.monthRevenue}

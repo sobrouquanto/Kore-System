@@ -247,7 +247,7 @@ export default function IATab() {
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg,var(--green),var(--blue))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>🤖</div>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 700 }}>IA Assistente MEI 360</div>
+              <div style={{ fontSize: '14px', fontWeight: 700 }}>IA Assistente Kore System</div>
               <div style={{ fontSize: '12px', color: 'var(--green)' }}>● Online · Treinada com seus dados reais</div>
             </div>
           </div>

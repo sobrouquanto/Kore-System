@@ -93,7 +93,7 @@ export default function ConfiguracoesTab() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
           <div>
             <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '4px' }}>💳 Assinatura</div>
-            <div style={{ fontSize: '12px', color: 'var(--text3)' }}>Gerencie seu plano MEI 360 OS</div>
+            <div style={{ fontSize: '12px', color: 'var(--text3)' }}>Gerencie seu plano Kore System</div>
           </div>
           <span style={{ background: planBg, border: `1px solid ${planBorder}`, color: planColor, padding: '4px 12px', borderRadius: '99px', fontSize: '12px', fontWeight: 700 }}>
             {planActive ? '✓ ' : ''}{planLabel}
@@ -177,7 +177,7 @@ export default function ConfiguracoesTab() {
       {/* Segurança */}
       <div className="card">
         <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '4px' }}>🔒 Segurança</div>
-        <div style={{ fontSize: '12px', color: 'var(--text3)', marginBottom: '14px' }}>Altere sua senha de acesso ao MEI 360 OS.</div>
+        <div style={{ fontSize: '12px', color: 'var(--text3)', marginBottom: '14px' }}>Altere sua senha de acesso ao Kore System.</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div className="form-group-sm">
             <label>Nova senha</label>

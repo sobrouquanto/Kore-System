@@ -252,6 +252,70 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     setToasts(prev => prev.filter(t => t.id !== id))
   }
 
+  // ── Gatilhos de notificação ───────────────────────────────────────────────
+async function checkAndNotify(userId: string, dasData: DasHistory[], receivablesData: Receivable[], yearRevenue: number) {
+  const today = new Date()
+  const day = today.getDate()
+  const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`
+  const notifyKey = `kore_notified_${userId}_${currentMonth}`
+
+  // Evita disparar as mesmas notificações mais de uma vez por mês
+  if (typeof window !== 'undefined' && localStorage.getItem(notifyKey)) return
+  
+  const notifications: { title: string; body: string; event: string }[] = []
+
+  // 1. DAS vencendo (entre dia 15 e 20)
+  if (day >= 15 && day <= 20) {
+    const dasPago = dasData.some(d => d.reference_month === currentMonth)
+    if (!dasPago) {
+      notifications.push({
+        title: '🏛️ DAS vencendo em breve',
+        body: `O DAS de ${today.toLocaleString('pt-BR', { month: 'long' })} vence no dia 20. Não esqueça de pagar!`,
+        event: 'das_vencendo',
+      })
+    }
+  }
+
+  // 2. Recebíveis vencendo em até 3 dias
+  const em3dias = new Date()
+  em3dias.setDate(em3dias.getDate() + 3)
+  const vencendo = receivablesData.filter(r => {
+    if (r.status !== 'pending') return false
+    const due = new Date(r.due_date + 'T12:00:00')
+    return due <= em3dias && due >= today
+  })
+  if (vencendo.length > 0) {
+    notifications.push({
+      title: `⏰ ${vencendo.length} cobrança${vencendo.length > 1 ? 's' : ''} vencendo`,
+      body: vencendo.length === 1
+        ? `${vencendo[0].client_name} — vence em ${formatDateBR(vencendo[0].due_date)}`
+        : `${vencendo.map(r => r.client_name).join(', ')} vencem nos próximos 3 dias`,
+      event: 'receber_vencendo',
+    })
+  }
+
+  // 3. Limite MEI (80% = R$ 64.800)
+  if (yearRevenue >= 64800) {
+    notifications.push({
+      title: '⚠️ Limite MEI próximo',
+      body: `Você atingiu ${((yearRevenue / 81000) * 100).toFixed(0)}% do limite anual. Faturamento: R$ ${yearRevenue.toLocaleString('pt-BR')}.`,
+      event: 'limite_mei',
+    })
+  }
+
+  if (notifications.length === 0) return
+
+  // Salva no banco
+  await Promise.all(notifications.map(n =>
+    supabase.from('notifications').insert({ user_id: userId, ...n, read: false })
+  ))
+
+  // Marca como notificado neste mês
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(notifyKey, '1')
+  }
+}
+
   // ── Session check ─────────────────────────────────────────────────────────
   useEffect(() => {
     async function checkSession() {
@@ -331,6 +395,9 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     })))
     setLoading(false)
     await loadIntegrations(u.id)
+
+    const yearRev = (resTxYear.data || []).reduce((s: number, t: any) => s + t.value, 0)
+    await checkAndNotify(u.id, resDas.data || [], resRec.data || [], yearRev)
   }, [])
 
   // ── loadTransactions — recarrega só transações (após lançamento/delete) ──

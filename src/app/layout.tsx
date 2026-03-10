@@ -1,8 +1,8 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Sora, DM_Mono } from 'next/font/google'
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
 
-// Configurando as fontes originais do seu design
 const sora = Sora({ 
   subsets: ['latin'], 
   variable: '--sans',
@@ -16,18 +16,17 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'MEI 360 OS',
-  description: 'Sistema Operacional para MEI',
+  title: 'Kore System',
+  description: 'Sistema de Gestão para MEI',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-br" className={`${sora.variable} ${dmMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <ServiceWorkerRegister />
+        {children}
+      </body>
     </html>
   )
 }

@@ -7,7 +7,7 @@ test('Landing carrega', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
 
   // valida algo que sempre existe na landing (ajuste se a landing não tiver isso)
-  await expect(page.locator('text=MEI 360 OS').first()).toBeVisible({ timeout: 15000 });
+  await expect(page.locator('text=Kore System').first()).toBeVisible({ timeout: 15000 });
 
   await done();
 });

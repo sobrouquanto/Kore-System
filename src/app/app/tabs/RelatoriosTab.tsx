@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useDashboard, fmt, pctOf, Transaction } from '@/context/DashboardContext'
 import { HealthRing, Chart6Months, LimitBar } from '@/components/ui'
+import PDFExport from '@/app/app/relatorios/PDFExport'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -147,6 +148,12 @@ export default function RelatoriosTab() {
 
   return (
     <>
+    {/* ── Exportar PDFs ─────────────────────────────────────────────────── */}
+<div style={{ marginBottom: 28 }}>
+  <PDFExport />
+</div>
+
+<div style={{ height: '1px', background: 'var(--card-border)', marginBottom: 28 }} />
       {/* ── Header com filtro de ano ───────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
         <div>

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useDashboard, fmt } from '@/context/DashboardContext'
 import { ConfirmModal, HealthRing } from '@/components/ui'
 import { KoreLogo } from '@/components/KoreLogo'
+import NotificationBell from '@/components/NotificationBell'
 
 export type TabId =
   | 'cockpit' | 'financeiro' | 'lancamentos' | 'clientes'
@@ -37,6 +38,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const {
+    user,
     userName, userBiz, stats,
     trialDaysLeft, trialExpired, planActive,
     confirmModal, setConfirmModal, doLogout,
@@ -128,34 +130,37 @@ export default function DashboardLayout({
       {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
 
       {/* ── MAIN ───────────────────────────────────────── */}
-      <main className="main">
-        <div className="topbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
-            <div>
-              <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.5px' }}>
-                {NAV_ITEMS.find(n => n.id === activeTab)?.icon} {TAB_LABELS[activeTab]}
-              </div>
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '1px' }}>
-                {userBiz} · {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-              </div>
-            </div>
-          </div>
-
-          <div className="topbar-stats">
-            <div className="topbar-stat">
-              <span style={{ color: 'var(--blue)', fontFamily: 'var(--mono)', fontWeight: 800, fontSize: '15px' }}>{fmt(stats.monthRevenue)}</span>
-              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px' }}>Receita mês</span>
-            </div>
-            <div className="topbar-stat">
-              <span style={{ color: '#93c5fd', fontFamily: 'var(--mono)', fontWeight: 800, fontSize: '15px' }}>{fmt(stats.monthProfit)}</span>
-              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px' }}>Lucro</span>
-            </div>
-            <div className="topbar-stat" style={{ alignItems: 'center' }}>
-              <HealthRing score={stats.healthScore} />
-            </div>
-          </div>
+     <main className="main">
+  <div className="topbar">
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <button className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
+      <div>
+        <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.5px' }}>
+          {NAV_ITEMS.find(n => n.id === activeTab)?.icon} {TAB_LABELS[activeTab]}
         </div>
+        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '1px' }}>
+          {userBiz} · {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+        </div>
+      </div>
+    </div>
+
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      {user?.id && <NotificationBell userId={user.id} />}
+      <div className="topbar-stats">
+        <div className="topbar-stat">
+          <span style={{ color: 'var(--blue)', fontFamily: 'var(--mono)', fontWeight: 800, fontSize: '15px' }}>{fmt(stats.monthRevenue)}</span>
+          <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px' }}>Receita mês</span>
+        </div>
+        <div className="topbar-stat">
+          <span style={{ color: '#93c5fd', fontFamily: 'var(--mono)', fontWeight: 800, fontSize: '15px' }}>{fmt(stats.monthProfit)}</span>
+          <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px' }}>Lucro</span>
+        </div>
+        <div className="topbar-stat" style={{ alignItems: 'center' }}>
+          <HealthRing score={stats.healthScore} />
+        </div>
+      </div>
+    </div>
+  </div>
 
         <div className="page-content">
           {children}
